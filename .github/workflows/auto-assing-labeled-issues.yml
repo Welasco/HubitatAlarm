@@ -1,0 +1,15 @@
+name: Auto Assign labeled issues
+on:
+  issues:
+    types: [labeled]
+jobs:
+  Move_Labeled_Issue_On_Project_Board:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: konradpabjan/move-labeled-or-milestoned-issue@v2.0
+      with:
+        action-token: "${{ secrets.GITHUB_TOKEN }}"
+        project-url: "https://github.com/Welasco/HubitatAlarm/projects/1"
+        column-name: "In progress"
+        label-name: "In progress"
+        columns-to-ignore: ""
