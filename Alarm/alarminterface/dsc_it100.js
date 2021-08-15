@@ -5,12 +5,12 @@ const Delimiter = require('@serialport/parser-delimiter')
 const Ready = require('@serialport/parser-ready')
 const log = require('../tools/logger');
 const nconf = require('nconf');
-nconf.file({ file: '../config/config.json' });
+nconf.file({ file: './config/config.json' });
 
 // Constant with configuration settings
-const linuxSerialUSBtty = nconf.get('dscalarm:linuxSerialUSBtty');;
-const alarmPassword = nconf.get('dscalarm:alarmpassword');
-const baudRate = nconf.get('dscalarm:baudRate');
+const linuxSerialUSBtty = nconf.get('alarm:linuxSerialUSBtty');;
+const alarmPassword = nconf.get('alarm:alarmpassword');
+const baudRate = nconf.get('alarm:baudRate');
 
 // Global Variables
 var dscSerialPort;
@@ -222,7 +222,7 @@ function alarmSetDate() {
 /**
  * Change the DSC-IT100 Serial Boud rate speed.
  * Note: Function not in use
- * @param {String} speed 
+ * @param {String} speed
  */
 function alarmSetBaudRate(speed) {
     // setup and send baud rate command
@@ -244,7 +244,7 @@ function alarmSetBaudRate(speed) {
     else if (speed == '115200') {
         cmd = cmd + '4';
     }
-    else  // By default set to 9600 
+    else  // By default set to 9600
     {
         cmd = cmd + '0';
     }
@@ -255,9 +255,9 @@ function alarmSetBaudRate(speed) {
  * Method used to append the right checksum at the end of any command sent to DSC IT-100 Board
  * According with DSC IT-100 manual each command sent to the board must have a checksum
  * This method will calculate the checksum according to the command that need to be sent
- * Will return the data ready to be sent to DSC IT-100 Board 
+ * Will return the data ready to be sent to DSC IT-100 Board
  * Alarm Documentation - http://cms.dsc.com/download.php?t=1&id=16238
- * @param {String} data 
+ * @param {String} data
  * @returns - returns DSC-IT100 command with the appended calculated checksum.
  */
 function appendChecksum(data) {
@@ -283,13 +283,17 @@ function parseReceivedData(data) {
     let cmdFullStr = data.toString('ascii');
     if (cmdFullStr.length >= 3) {
         let cmd = cmdFullStr.substr(0, 3);
-        if (cmd == '500') {
-            responseHandler = command_map[cmdFullStr]['handler'];
-            responseHandler(cmd,cmdFullStr);            
-        }
-        else{
-            responseHandler = command_map[cmd]['handler'];
-            responseHandler(cmd,cmdFullStr);
+        try {
+            if (cmd == '500') {
+                responseHandler = command_map[cmdFullStr]['handler'];
+                responseHandler(cmd,cmdFullStr);
+            }
+            else{
+                responseHandler = command_map[cmd]['handler'];
+                responseHandler(cmd,cmdFullStr);
+            }
+        } catch (error) {
+            log.silly('parseReceivedData: Handler not found for the received command: '+cmd);
         }
     }
 }
@@ -300,7 +304,7 @@ function parseReceivedData(data) {
  * @param {command_map} data
  */
 function event_emit(data) {
-    log.debug('DSC-IT100: Response message: ' + data);
+    log.debug('DSC-IT100: Response message: ' + JSON.stringify(data));
     emitter.emit('read', data);
 }
 
@@ -311,7 +315,7 @@ function event_emit(data) {
  * @parseZoneChange - parse zones update Open and Close.
  * @parseCodeRequired - parse when DSC-IT100 requires to enter the code.
  * @parseChimeToggle - parse Chime ON/OFF
- * 
+ *
  * @param {String} cmd - The received DSC-IT100 command. Only the first 3 numbers.
  * @param {String} cmdFullStr - The entire code number from DSC-IT100.
 */
@@ -336,7 +340,7 @@ function parseCodeRequired(cmd,cmdFullStr) {
 }
 
 function parseChimeToggle(cmd,cmdFullStr) {
-    let chime = command_map[cmd];    
+    let chime = command_map[cmd];
     if (cmdFullStr.indexOf('Door Chime') >= 0) {
         if (cmdFullStr.indexOf('ON') >= 0) {
             chime.status = 'ON';
@@ -344,8 +348,9 @@ function parseChimeToggle(cmd,cmdFullStr) {
         else {
             chime.status = 'OFF';
         }
+        event_emit(chime);
     }
-    event_emit(chime);    
+
 }
 
 /**
@@ -359,7 +364,7 @@ var command_map = {
         'code': '50003129',
         'type': 'partition',
         'handler': parseAcknowledgementArm
-    },    
+    },
     '50003129': {
         'name': 'Acknowledgement of ArmStay command',
         'description': 'This code is the acknowledgement of the ArmStay command.',
@@ -384,14 +389,15 @@ var command_map = {
         'type': 'partition',
         'handler': parseAcknowledgementArm
     },
-    '50004029': {
-        'name': 'Acknowledgement of Disarm command',
-        'description': 'This code is the acknowledgement of the Disarm command.',
-        'code': '50004029',
-        'hsmStatus':'disarmed',
-        'type': 'partition',
-        'handler': parseAcknowledgementArm
-    },
+    // Commented it's redundant to 655 command.
+    // '50004029': {
+    //     'name': 'Acknowledgement of Disarm command',
+    //     'description': 'This code is the acknowledgement of the Disarm command.',
+    //     'code': '50004029',
+    //     'hsmStatus':'disarmed',
+    //     'type': 'partition',
+    //     'handler': parseAcknowledgementArm
+    // },
     '501': {
         'name': 'Invalid command',
         'description': 'Command has been received with a bad checksum.',
@@ -535,7 +541,7 @@ var command_map = {
         'code': '801',
         'type': 'partition',
         'handler': parseGenericReceivedData
-    },        
+    },
     '802': {
         'name': 'Lost Power',
         'description': 'AC power to the panel has been removed.',
@@ -591,7 +597,7 @@ var command_map = {
         'code': '811',
         'type': 'partition',
         'handler': parseGenericReceivedData
-    },    
+    },
     '821': {
         'name': 'Device Low Battery',
         'description': 'Wireless zone has a low battery.',
