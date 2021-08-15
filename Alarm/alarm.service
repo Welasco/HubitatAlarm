@@ -3,7 +3,8 @@ Description=Alarm
 After=network.target
 
 [Service]
-ExecStart=/home/pi/HubitatAlarm/Alarm/alarm.js
+#ExecStart=/home/pi/HubitatAlarm/Alarm/alarm.js
+ExecStart=npm start
 Restart=always
 User=pi
 Group=pi
