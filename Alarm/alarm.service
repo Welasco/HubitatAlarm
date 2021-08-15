@@ -1,0 +1,15 @@
+﻿[Unit]
+Description=Alarm
+After=network.target
+
+[Service]
+ExecStart=/home/pi/HubitatAlarm/Alarm/alarm.js
+Restart=always
+User=pi
+Group=pi
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=production
+WorkingDirectory=/home/pi/HubitatAlarm/Alarm
+
+[Install]
+WantedBy=multi-user.target

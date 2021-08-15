@@ -1,0 +1,208 @@
+// Reading data from Alarm and sending to Hubitat
+Possible JSON for communication
+
+{
+    "type": "zone/discover",
+    "command": "",
+    "fullcommand: "",
+    "authors": "Victor Santana",
+    "version": "0.0.1",
+    "main": "wss.js",
+    "scripts": {
+        "start": "node wss.js"
+    },
+    "dependencies": {
+        "tail": "2.2.3",
+        "express": "4.17.1",
+        "ws": "7.5.3"
+    }
+}
+
+
+
+
+function parseReceivedData(data) {
+    logger("SerialPort","Received Serial data: " + data);
+    var cmdfullstr = data.toString('ascii');
+    if (cmdfullstr.length >= 3){
+        var cmd = cmdfullstr.substr(0, 3);
+        if (cmd == "609") {
+            var msg = ("ZN-" + cmdfullstr.substr(0, 6));
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "610") {
+            var msg = ("ZN-" + cmdfullstr.substr(0, 6));
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "621") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "622") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "650") {
+            var msg = ("RD-1");
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "651") {
+            var msg = ("RD-0");
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "656") {
+            var msg = ("AR-2");
+            sendSmartThingMsg(msg);
+        }
+        else if ((cmd == "652") || (cmd == "700")) {
+            var msg = ("AR-3");
+            sendSmartThingMsg(msg);
+        }
+        else if ((cmd == "655") || (cmd == "750")) {
+            var msg = ("AR-0");
+            sendSmartThingMsg(msg);
+            var msg = ("AL-0");
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "654") {
+            var msg = ("AL-1");
+            sendSmartThingMsg(msg);
+
+        }
+        else if (cmd == "900") {
+            alarmSendCode();
+        }
+        else if (cmd == "901") {
+            if (cmdfullstr.indexOf("Door Chime") >= 0) {
+                if (cmdfullstr.indexOf("ON") >= 0) {
+                    var msg = ("CH-1");
+                    sendSmartThingMsg(msg);
+                }
+                else {
+                    var msg = ("CH-0");
+                    sendSmartThingMsg(msg);
+                }
+            }
+        }
+        else if (cmd == "658") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "659") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }        
+        else if (cmd == "670") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "672") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "673") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }        
+        else if (cmd == "802") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "803") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "806") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "807") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "810") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "811") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "812") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "813") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "821") {
+            var msg = ("SY-" + cmdfullstr.substr(0, 6));
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "822") {
+            var msg = ("SY-" + cmdfullstr.substr(0, 6));
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "829") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "830") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "840") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "841") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "842") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "843") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "896") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "897") {
+            var msg = ("SY-" + cmd);
+            sendSmartThingMsg(msg);
+        }
+        else if (cmd == "500") {
+            // Alarm command 031 means stay
+            // if ((cmdfullstr.substr(0, 8)) == "5000332B") {
+            if ((cmdfullstr.substr(0, 8)) == "50003129") {
+                var msg = ("AR-112");
+                sendSmartThingMsg(msg);
+            }
+            // Alarm command 033 means arm with code but with delay entry
+            //else if ((cmdfullstr.substr(0, 8)) == "50003129") {
+            else if ((cmdfullstr.substr(0, 8)) == "5000332B") {
+                var msg = ("AR-114");
+                sendSmartThingMsg(msg);
+            }
+            // Alarm command 030 means away
+            //else if ((cmdfullstr.substr(0, 8)) == "5000322A") {
+            else if ((cmdfullstr.substr(0, 8)) == "50003028") {                
+                
+                var msg = ("AR-110");
+                sendSmartThingMsg(msg);
+            }
+            else if ((cmdfullstr.substr(0, 8)) == "50004029") {
+              var msg = ("AR-0");
+              sendSmartThingMsg(msg);
+            }
+        }        
+        else {
+
+        }
+    }
+}
