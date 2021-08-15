@@ -5,7 +5,7 @@ const Delimiter = require('@serialport/parser-delimiter')
 const Ready = require('@serialport/parser-ready')
 const log = require('../tools/logger');
 const nconf = require('nconf');
-nconf.file({ file: './config.json' });
+nconf.file({ file: '../config/config.json' });
 
 // Constant with configuration settings
 const linuxSerialUSBtty = nconf.get('dscalarm:linuxSerialUSBtty');;
@@ -87,9 +87,11 @@ var dscSerial = function () {
         });
         dscSerialPort.on('close', function showPortClose() {
             log.error('SerialPort: Serial Port closed: ' + linuxSerialUSBtty);
+            emitter.emit('close', 'SerialPort: Serial port closed.');
         });
         dscSerialPort.on('error', function showError(error) {
             log.error('SerialPort: Serial port error: ' + error);
+            emitter.emit('error', 'SerialPort: Serial port error: '+error);
         });
         const serialPortparser = dscSerialPort.pipe(new SerialReadline({ delimiter: '\r\n' }))
         serialPortparser.on('data', function receivedFromSerial(data) {
