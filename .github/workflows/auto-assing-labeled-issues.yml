@@ -1,4 +1,4 @@
-name: Auto Assign labeled issues
+name: Auto move the labeled issues to the right Board column
 on:
   issues:
     types: [labeled]
@@ -6,10 +6,43 @@ jobs:
   Move_Labeled_Issue_On_Project_Board:
     runs-on: ubuntu-latest
     steps:
-    - uses: konradpabjan/move-labeled-or-milestoned-issue@v2.0
+    - name: Move labeled issue In progress
+      uses: konradpabjan/move-labeled-or-milestoned-issue@v2.0
       with:
         action-token: "${{ secrets.GITHUB_TOKEN }}"
         project-url: "https://github.com/Welasco/HubitatAlarm/projects/1"
         column-name: "In progress"
         label-name: "In progress"
+        columns-to-ignore: ""
+    - name: Move labeled issue Alarm
+      uses: konradpabjan/move-labeled-or-milestoned-issue@v2.0
+      with:
+        action-token: "${{ secrets.GITHUB_TOKEN }}"
+        project-url: "https://github.com/Welasco/HubitatAlarm/projects/1"
+        column-name: "Alarm"
+        label-name: "Alarm"
+        columns-to-ignore: ""
+    - name: Move labeled issue EnvisaLink
+      uses: konradpabjan/move-labeled-or-milestoned-issue@v2.0
+      with:
+        action-token: "${{ secrets.GITHUB_TOKEN }}"
+        project-url: "https://github.com/Welasco/HubitatAlarm/projects/1"
+        column-name: "EnvisaLink"
+        label-name: "EnvisaLink"
+        columns-to-ignore: ""
+    - name: Move labeled issue Honeywell
+      uses: konradpabjan/move-labeled-or-milestoned-issue@v2.0
+      with:
+        action-token: "${{ secrets.GITHUB_TOKEN }}"
+        project-url: "https://github.com/Welasco/HubitatAlarm/projects/1"
+        column-name: "Honeywell"
+        label-name: "Honeywell"
+        columns-to-ignore: ""
+    - name: Move labeled issue DSC
+      uses: konradpabjan/move-labeled-or-milestoned-issue@v2.0
+      with:
+        action-token: "${{ secrets.GITHUB_TOKEN }}"
+        project-url: "https://github.com/Welasco/HubitatAlarm/projects/1"
+        column-name: "DSC"
+        label-name: "DSC"
         columns-to-ignore: ""
