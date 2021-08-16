@@ -248,7 +248,4 @@ ModelManifest.xml
 typings/
 
 package-lock.json
-config.json.working
-Alarm/config/config.json.working
-Alarm/config/config.json
 bkp/
