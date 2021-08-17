@@ -1,9 +1,9 @@
 class dsc_eventParser {
     constructor() {
     }
-    GetCode(code) {
-        let responseHandler = command_map[code]['handler'];
-        return responseHandler(code);
+    GetCode(cmd,cmdFullStr) {
+        let responseHandler = command_map[cmd]['handler'];
+        return responseHandler(cmd,cmdFullStr);
     }
 }
 exports.dsc_eventParser = dsc_eventParser
@@ -19,29 +19,29 @@ exports.dsc_eventParser = dsc_eventParser
  * @param {String} cmd - The received DSC-IT100 command. Only the first 3 numbers.
  * @param {String} cmdFullStr - The entire code number from DSC-IT100.
 */
-function parseGenericReceivedData(cmd) {
+function parseGenericReceivedData(cmd,cmdFullStr) {
     let updatePartition = command_map[cmd];
     return updatePartition;
 }
 
-function parseAcknowledgementArm(cmd) {
+function parseAcknowledgementArm(cmd,cmdFullStr) {
     let ack = command_map[cmdFullStr];
     return ack;
 }
 
-function parseZoneChange(cmd) {
+function parseZoneChange(cmd,cmdFullStr) {
     let zone = command_map[cmd];
     zone.zone = cmdFullStr.substr(3, 3);
     return zone;
 }
 
-function parseCodeRequired(cmd) {
+function parseCodeRequired(cmd,cmdFullStr) {
     let alarmCodeRequired = command_map[cmd];
     return alarmCodeRequired;
     //alarmSendCode()
 }
 
-function parseChimeToggle(cmd) {
+function parseChimeToggle(cmd,cmdFullStr) {
     let chime = command_map[cmd];
     if (cmdFullStr.indexOf('Door Chime') >= 0) {
         if (cmdFullStr.indexOf('ON') >= 0) {
