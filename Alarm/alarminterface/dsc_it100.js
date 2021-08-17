@@ -123,7 +123,7 @@ var dscSerial = function () {
                 alarmSendCode();
             }
             else {
-                alarmEvent = _alarmEventParser[cmd,cmdFullStr];
+                alarmEvent = _alarmEventParser.GetCode(cmd,cmdFullStr);
                 event_emit(alarmEvent);
             }
         } catch (error) {
