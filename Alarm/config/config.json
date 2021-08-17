@@ -2,8 +2,17 @@
     "httpport": 3000,
     "alarm": {
       "alarmpassword": "1234",
-      "linuxSerialUSBtty": "/dev/ttyUSB0",
-      "baudRate": 9600,
+      "dsc_it100":{
+        "linuxSerialUSBtty": "/dev/ttyUSB0",
+        "baudRate": 9600
+      },
+      "envisalink":{
+        "ip": "",
+        "port": "",
+        "password": ""
+      },
+      "type": "dsc",
+      "connectionType": "it100",
       "panelConfig": {
         "type": "discover",
         "zones": [

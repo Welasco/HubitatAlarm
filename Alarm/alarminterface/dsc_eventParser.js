@@ -29,6 +29,12 @@ function parseAcknowledgementArm(cmd,cmdFullStr) {
     return ack;
 }
 
+function parseEnvisalinkLogin(cmd,cmdFullStr) {
+    let login = command_map[cmd];
+    login.login_command = cmdFullStr.substr(0, 4);
+    return login;
+}
+
 function parseZoneChange(cmd,cmdFullStr) {
     let zone = command_map[cmd];
     zone.zone = cmdFullStr.substr(3, 3);
@@ -105,6 +111,14 @@ var command_map = {
         'code': '501',
         'type': 'partition',
         'handler': parseGenericReceivedData
+    },
+    '505': {
+        'name': 'Login Interaction',
+        'description': 'Envisalink Login interaction. 0 = Fail 1 = Successful 2 = Timed_Out 3 = Password Request',
+        'code': '505',
+        'login_command': '',
+        'type': 'partition',
+        'handler': parseEnvisalinkLogin
     },
     '609': {
         'name': 'Zone open',

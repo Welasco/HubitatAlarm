@@ -3,21 +3,19 @@ const FileWatcher = require("./file_watcher").FileWatcher;
 const Socket = require("./socket_client").Socket;
 
 var emitter;
-var alarm_type;
 class Alarm extends EventEmitter {
-    constructor(alarm_type){
+    constructor(connectionType){
         super();
         emitter = this;
-        alarm_type = alarm_type;
         switch (alarm_type) {
-            case "File_Watcher":
+            case "dsc":
                 //console.log("switch case File_Watcher");
                 this.tail = new FileWatcher();
-                this.read_FileWatcher();                
+                this.read_FileWatcher();
                 break;
-            
-            case "Socket":
-                this.read_Socket();    
+
+            case "honeywell":
+                this.read_Socket();
                 break;
             default:
                 break;
@@ -33,7 +31,7 @@ class Alarm extends EventEmitter {
         this.tail.on("error", function(error) {
             console.log('ERROR: ', error);
             emitter.emit("error",error);
-        });        
+        });
     }
     read_Socket(){
         this.socket = new Socket();
@@ -45,21 +43,21 @@ class Alarm extends EventEmitter {
             console.log('ERROR: ', error);
             emitter.emit("error",error);
         });
-    }    
+    }
     send(msg){
         switch (alarm_type) {
             case "File_Watcher":
                 //console.log("switch case File_Watcher");
                 // this.tail = new FileWatcher();
-                // this.read_FileWatcher();                
+                // this.read_FileWatcher();
                 break;
-            
+
             case "Socket":
                 this.socket.send(msg);
                 break;
             default:
                 break;
-        }        
+        }
     }
     stop(){
         this.tail.unwatch()
