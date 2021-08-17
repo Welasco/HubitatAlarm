@@ -103,6 +103,37 @@ var dscSerial = function () {
     }
 }
 
+/**
+ * Method used to parser all DSC-IT100 messages.
+ * @param {Stream} data - Stream buffer received from DSC-IT100
+ */
+ function parseReceivedData(data) {
+    log.debug('SerialPort: Received Serial data: ' + data);
+    let alarmEvent;
+    let cmdFullStr = data.toString('ascii');
+    if (cmdFullStr.length >= 3) {
+        let cmd = cmdFullStr.substr(0, 3);
+        try {
+            if (cmd == '500') {
+                alarmEvent = _alarmEventParser.GetCode(cmd,cmdFullStr);
+                event_emit(alarmEvent);
+            }
+            else if(cmd == '900'){
+                // alarm code required. Don't need to generate an event.
+                alarmSendCode();
+            }
+            else {
+                alarmEvent = _alarmEventParser.GetCode(cmd,cmdFullStr)
+                if (typeof alarmEvent !== 'undefined'){
+                    event_emit(alarmEvent);
+                }
+            }
+        } catch (error) {
+            log.silly('parseReceivedData: Alarm received command not mapped: '+cmd);
+        }
+    }
+}
+
 // Method used to send serial data
 function sendToSerial(cmd) {
     log.debug('SerialPort: Sending to serial port: ' + cmd);
@@ -274,35 +305,6 @@ function appendChecksum(data) {
     });
     data = data + (parseInt(result, 10).toString(16).toUpperCase().slice(-2) + '\r\n');
     return data;
-}
-
-/**
- * Method used to parser all DSC-IT100 messages.
- * @param {Stream} data - Stream buffer received from DSC-IT100
- */
-function parseReceivedData(data) {
-    log.debug('SerialPort: Received Serial data: ' + data);
-    let alarmEvent;
-    let cmdFullStr = data.toString('ascii');
-    if (cmdFullStr.length >= 3) {
-        let cmd = cmdFullStr.substr(0, 3);
-        try {
-            if (cmd == '500') {
-                alarmEvent = _alarmEventParser[cmdFullStr];
-                event_emit(alarmEvent);
-            }
-            else if(cmd == '900'){
-                // alarm code required. Don't need to generate an event.
-                alarmSendCode();
-            }
-            else {
-                alarmEvent = _alarmEventParser[cmd];
-                event_emit(alarmEvent);
-            }
-        } catch (error) {
-            log.silly('parseReceivedData: Handler not found for the received command: '+cmd);
-        }
-    }
 }
 
 /**
