@@ -123,11 +123,13 @@ var dscSerial = function () {
                 alarmSendCode();
             }
             else {
-                alarmEvent = _alarmEventParser.GetCode(cmd,cmdFullStr);
-                event_emit(alarmEvent);
+                alarmEvent = _alarmEventParser.GetCode(cmd,cmdFullStr)
+                if (typeof alarmEvent !== 'undefined'){
+                    event_emit(alarmEvent);
+                }
             }
         } catch (error) {
-            log.silly('parseReceivedData: Handler not found for the received command: '+cmd);
+            log.silly('parseReceivedData: Alarm received command not mapped: '+cmd);
         }
     }
 }
