@@ -120,7 +120,7 @@ var dsc_it100 = function () {
                 emitter.alarmSendCode();
             }
             else if (data.code == '5053') {
-                emitter.alarmSendCode();
+                emitter.alarmEnvisalinkLogin();
             }
             else{
                 emitter.emit('read', data);
