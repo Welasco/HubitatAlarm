@@ -3,6 +3,7 @@ const nconf = require('nconf');
 nconf.file({ file: './config/config.json' });
 
 const alarmPassword = nconf.get('alarm:alarmpassword');
+const envisalinkPassword = nconf.get('alarm:envisalink:password');
 
 /**
  * Class used to implement all DSC commands
@@ -12,7 +13,7 @@ class dsc_commands  {
     }
     // Send the Arm command to Alarm
     alarmArm() {
-        return appendChecksum('0331' + alarmPassword + '00');
+        return appendChecksum('0331' + get_alarmPassword());
     }
     // Send the ArmAway command to Alarm
     alarmArmAway() {
@@ -24,11 +25,11 @@ class dsc_commands  {
     }
     // Send the ArmNight command to Alarm
     alarmArmNight() {
-        return appendChecksum('0331' + alarmPassword + '00');
+        return appendChecksum('0331' + get_alarmPassword());
     }
     // Send the Disarm command to Alarm
     alarmDisarm() {
-        return appendChecksum('0401' + alarmPassword + '00');
+        return appendChecksum('0401' + get_alarmPassword());
     }
     // Send the Break command to Alarm
     alarmSendBreak() {
@@ -56,11 +57,11 @@ class dsc_commands  {
     }
     // This command will send the code to the alarm when ever the alarm ask for it with a 900
     alarmSendCode() {
-        return appendChecksum('2001' + alarmPassword + '00');
+        return appendChecksum('2001' + get_alarmPassword());
     }
     // This command will send the code to the alarm when ever the alarm ask for it with a 900
     alarmEnvisalinkLogin() {
-        return appendChecksum('005' + alarmPassword + '00');
+        return appendChecksum('005' + envisalinkPassword);
     }
     // alarm Status Request
     alarmUpdate() {
@@ -130,6 +131,15 @@ function alarmSetBaudRate(speed) {
         cmd = cmd + '0';
     }
     return cmd;
+}
+
+function get_alarmPassword() {
+    if(alarmPassword.length ==4){
+        return alarmPassword+'00';
+    }
+    else{
+        return alarmPassword
+    }
 }
 
 /**

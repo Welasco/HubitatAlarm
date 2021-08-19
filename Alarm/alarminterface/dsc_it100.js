@@ -15,7 +15,7 @@ const baudRate = nconf.get('alarm:dsc_it100:baudRate');
 
 // Global Variables
 var dscSerialPort;
-var emitter;
+var self;
 
 /**
  * Class used to implement the access to DSC-IT100 board using RS232 Serial communication.
@@ -23,7 +23,7 @@ var emitter;
 class dsc_it100 extends EventEmitter {
     constructor() {
         super();
-        emitter = this;
+        self = this;
         this.init();
     }
     init() {
@@ -50,11 +50,11 @@ var dscSerial = function () {
         });
         dscSerialPort.on('close', function showPortClose() {
             log.error('SerialPort: Serial Port closed: ' + linuxSerialUSBtty);
-            emitter.emit('close', 'SerialPort: Serial port closed.');
+            self.emit('close', 'SerialPort: Serial port closed.');
         });
         dscSerialPort.on('error', function showError(error) {
             log.error('SerialPort: Serial port error: ' + error);
-            emitter.emit('error', 'SerialPort: Serial port error: '+error);
+            self.emit('error', 'SerialPort: Serial port error: '+error);
         });
         const serialPortparser = dscSerialPort.pipe(new SerialReadline({ delimiter: '\r\n' }))
         serialPortparser.on('data', function receivedFromSerial(data) {
@@ -96,6 +96,5 @@ function sendToSerial(cmd) {
  * @param {command_map} data
  */
 function event_emit(data) {
-    log.debug('DSC-IT100: Response message: ' + JSON.stringify(data));
-    emitter.emit('read', data);
+    self.emit('read', data);
 }

@@ -7,12 +7,12 @@
         "baudRate": 9600
       },
       "envisalink":{
-        "ip": "",
-        "port": "",
-        "password": ""
+        "ip": "127.0.0.1",
+        "port": "3001",
+        "password": "1234"
       },
       "type": "dsc",
-      "connectionType": "it100",
+      "connectionType": "envisalink",
       "panelConfig": {
         "type": "discover",
         "zones": [
@@ -54,7 +54,7 @@
       "port": "39500"
     },
     "log":{
-        "loglevel": "silly",
+        "loglevel": "debug",
         "logtofile": true,
         "logfilepath": "alarm.log"
     }
