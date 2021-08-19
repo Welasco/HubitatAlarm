@@ -49,7 +49,7 @@ var dscSerial = function () {
             log.info('SerialPort: Serial port open');
         });
         dscSerialPort.on('close', function showPortClose() {
-            log.error('SerialPort: Serial Port closed: ' + linuxSerialUSBtty);
+            log.error('SerialPort: Serial Port closed ' + linuxSerialUSBtty);
             self.emit('close', 'SerialPort: Serial port closed.');
         });
         dscSerialPort.on('error', function showError(error) {
@@ -68,19 +68,11 @@ var dscSerial = function () {
  * @param {Stream} data - Stream buffer received from DSC-IT100
  */
  function parseReceivedData(data) {
-    log.debug('SerialPort: Received Serial data: ' + data);
-    let alarmEvent;
-    let cmdFullStr = data.toString('ascii');
-    if (cmdFullStr.length >= 3) {
-        let cmd = cmdFullStr.substr(0, 3);
-        try {
-            alarmEvent = _alarmEventParser.GetCode(cmd,cmdFullStr)
-            if (typeof alarmEvent !== 'undefined'){
-                event_emit(alarmEvent);
-            }
-        } catch (error) {
-            log.silly('parseReceivedData: Alarm received command not mapped: '+cmd);
-        }
+    log.silly('SerialPort: RAW received data: ' + data);
+    let cmd = data.toString('ascii');
+    if(cmd.length >= 3){
+        log.debug('SerialPort: Received Serial data: ' + data);
+        event_emit(cmd);
     }
 }
 
@@ -92,7 +84,7 @@ function sendToSerial(cmd) {
 
 /**
  * Emit an EventEmitter
- * It will send back a JSON from command_map with the system message from DSC-IT100.
+ * It will send back the DSC-IT100 received messages to a upper Class
  * @param {command_map} data
  */
 function event_emit(data) {

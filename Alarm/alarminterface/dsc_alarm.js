@@ -3,6 +3,8 @@ const log = require('../tools/logger');
 const nconf = require('nconf');
 const dsc_commands = require('./dsc_commands').dsc_commands;
 const _dsc_commands = new dsc_commands();
+const alarmEventParser = require('./dsc_eventParser').dsc_eventParser;
+let _alarmEventParser = new alarmEventParser();
 nconf.file({ file: './config/config.json' });
 
 // Global Variables
@@ -83,12 +85,7 @@ class dsc_alarm extends EventEmitter {
     #dsc_it100(){
         this.alarmConnection = new (require('./dsc_it100').dsc_it100);
         this.alarmConnection.on('read', function (data) {
-            if (data.code == '900') {
-                self.alarmSendCode();
-            }
-            else{
-                self.emit('read', data);
-            }
+            self.#parseReceivedData(data);
         });
         this.alarmConnection.on('error', function (error) {
             log.error('dsc_alarm: alarmConnection: ERROR: ', error);
@@ -96,22 +93,37 @@ class dsc_alarm extends EventEmitter {
         });
     }
     #dsc_envisalink(){
-        this.alarmConnection = new (require('./dsc_envisalink').dsc_envisalink);
+        this.alarmConnection = new (require('./envisalink').envisalink);
         this.alarmConnection.on('read', function (data) {
-            if (data.code == '900') {
-                self.alarmSendCode();
-            }
-            else if (data.login_command == '5053') {
-                self.alarmEnvisalinkLogin();
-            }
-            else{
-                self.emit('read', data);
-            }
+            self.#parseReceivedData(data);
         });
         this.alarmConnection.on('error', function (error) {
             log.error('dsc_alarm: alarmConnection: ERROR: ', error);
             self.emit('error',error);
         });
+    }
+    #parseReceivedData(data){
+        let alarmEvent;
+        let cmdFullStr = data;
+        if (cmdFullStr.length >= 3) {
+            let cmd = cmdFullStr.substr(0, 3);
+            try {
+                alarmEvent = _alarmEventParser.GetCode(cmd,cmdFullStr);
+                if (typeof alarmEvent !== 'undefined'){
+                    if (alarmEvent.code == '900') {
+                        self.alarmSendCode();
+                    }
+                    else if (alarmEvent.login_command == '5053') {
+                        self.alarmEnvisalinkLogin();
+                    }
+                    else{
+                        self.emit('read', alarmEvent);
+                    }
+                }
+            } catch (error) {
+                log.silly('parseReceivedData: Alarm received command not mapped: '+cmd);
+            }
+        }
     }
     #sendCommand(cmd){
         this.alarmConnection.sendCommand(cmd);
