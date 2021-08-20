@@ -60,10 +60,11 @@ var envisalink_net = function () {
             //data.toString('utf8').split(/\r?\n/).forEach( function (item) {
             //    parseReceivedData(data);
             //});
-            data.toString('ascii').split('\r\n').forEach( function (item) {
-                //log.debug('EnvisaLink: Received socket data: '+item);
-                parseReceivedData(item);
-            });
+            // data.toString('ascii').split('\r\n').forEach( function (item) {
+            //     //log.debug('EnvisaLink: Received socket data: '+item);
+            //     parseReceivedData(item);
+            // });
+            parseReceivedData(data);
         });
     }
 }
@@ -74,11 +75,12 @@ var envisalink_net = function () {
  * @param {Stream} data - Stream buffer received from EnvisaLink
  */
  function parseReceivedData(data) {
-    log.silly('EnvisaLink: RAW received data: ' + data);
-    if(data.length >= 3){
-        log.debug('EnvisaLink: Received data: ' + data);
-        event_emit(data);
-    }
+    log.debug('EnvisaLink: RAW received data: ' + data);
+    event_emit(data);
+    // if(data.length >= 3){
+    //     log.debug('EnvisaLink: Received data: ' + data);
+    //     event_emit(data);
+    // }
 }
 
 // Method used to data to EnvisaLink

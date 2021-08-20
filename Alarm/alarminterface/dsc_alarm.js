@@ -12,7 +12,7 @@ const connectionType = nconf.get('alarm:connectionType');
 var self;
 
 /**
- * Class used to implement the access to DSC-IT100 board using RS232 Serial communication.
+ * Class used to implement either DSC-IT100 or EvenisaLink access to a DSC board
  */
 class dsc_alarm extends EventEmitter {
     constructor() {
@@ -22,11 +22,11 @@ class dsc_alarm extends EventEmitter {
     }
     init() {
         switch (connectionType) {
-            case "it100":
+            case 'it100':
                 this.#dsc_it100();
                 break;
 
-            case "envisalink":
+            case 'envisalink':
                 this.#dsc_envisalink();
                 break;
             default:
@@ -88,8 +88,8 @@ class dsc_alarm extends EventEmitter {
             self.#parseReceivedData(data);
         });
         this.alarmConnection.on('error', function (error) {
-            log.error('dsc_alarm: alarmConnection: ERROR: ', error);
-            self.emit("error",error);
+            log.error('DSC-Alarm: alarmConnection: ERROR: ', error);
+            self.emit('error',error);
         });
     }
     #dsc_envisalink(){
@@ -98,32 +98,39 @@ class dsc_alarm extends EventEmitter {
             self.#parseReceivedData(data);
         });
         this.alarmConnection.on('error', function (error) {
-            log.error('dsc_alarm: alarmConnection: ERROR: ', error);
+            log.error('DSC-Alarm: alarmConnection: ERROR: ', error);
             self.emit('error',error);
         });
     }
     #parseReceivedData(data){
-        let alarmEvent;
-        let cmdFullStr = data;
-        if (cmdFullStr.length >= 3) {
-            let cmd = cmdFullStr.substr(0, 3);
-            try {
-                alarmEvent = _alarmEventParser.GetCode(cmd,cmdFullStr);
-                if (typeof alarmEvent !== 'undefined'){
-                    if (alarmEvent.code == '900') {
-                        self.alarmSendCode();
+        data.toString('ascii').split('\r\n').forEach( function (item) {
+            let alarmEvent;
+            let cmdFullStr = item;
+            if (cmdFullStr.length >= 3) {
+                let cmd = cmdFullStr.substr(0, 3);
+                try {
+                    log.silly('DSC-Alarm: Received commands: cmd: '+cmd+' cmdFullStr: '+cmdFullStr);
+                    alarmEvent = _alarmEventParser.GetCode(cmd,cmdFullStr);
+                    log.verbose('DSC-Alarm: Parced command event: '+JSON.stringify(alarmEvent));
+                    if (typeof alarmEvent !== 'undefined'){
+                        if (alarmEvent.code == '900') {
+                            self.alarmSendCode();
+                        }
+                        else if (alarmEvent.login_command == '5053') {
+                            self.alarmEnvisalinkLogin();
+                        }
+                        else{
+                            self.emit('read', alarmEvent);
+                        }
                     }
-                    else if (alarmEvent.login_command == '5053') {
-                        self.alarmEnvisalinkLogin();
-                    }
-                    else{
-                        self.emit('read', alarmEvent);
-                    }
+                } catch (error) {
+                    log.verbose('DSC-Alarm: Alarm received command not mapped: '+cmd);
                 }
-            } catch (error) {
-                log.silly('parseReceivedData: Alarm received command not mapped: '+cmd);
             }
-        }
+            else{
+                log.silly('DSC-Alarm: Received invalid command: '+item);
+            }
+        });
     }
     #sendCommand(cmd){
         this.alarmConnection.sendCommand(cmd);

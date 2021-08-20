@@ -51,10 +51,10 @@ function parseChimeToggle(cmd,cmdFullStr) {
     let chime = command_map[cmd];
     if (cmdFullStr.indexOf('Door Chime') >= 0) {
         if (cmdFullStr.indexOf('ON') >= 0) {
-            chime.status = 'ON';
+            chime.state = 'ON';
         }
         else {
-            chime.status = 'OFF';
+            chime.state = 'OFF';
         }
         return chime;
     }
@@ -76,7 +76,7 @@ var command_map = {
         'name': 'Acknowledgement of ArmStay command',
         'description': 'This code is the acknowledgement of the ArmStay command.',
         'code': '50003129',
-        'hsmStatus':'armedHome',
+        'hsmstate':'armedHome',
         'type': 'partition',
         'handler': parseAcknowledgementArm
     },
@@ -84,7 +84,7 @@ var command_map = {
         'name': 'Acknowledgement of ArmNight command',
         'description': 'This code is the acknowledgement of the ArmNight command.',
         'code': '5000332B',
-        'hsmStatus':'armedNight',
+        'hsmstate':'armedNight',
         'type': 'partition',
         'handler': parseAcknowledgementArm
     },
@@ -92,7 +92,7 @@ var command_map = {
         'name': 'Acknowledgement of ArmAway command',
         'description': 'This code is the acknowledgement of the ArmAway command.',
         'code': '50003028',
-        'hsmStatus':'armedAway',
+        'hsmstate':'armedAway',
         'type': 'partition',
         'handler': parseAcknowledgementArm
     },
@@ -101,7 +101,7 @@ var command_map = {
     //     'name': 'Acknowledgement of Disarm command',
     //     'description': 'This code is the acknowledgement of the Disarm command.',
     //     'code': '50004029',
-    //     'hsmStatus':'disarmed',
+    //     'hsmstate':'disarmed',
     //     'type': 'partition',
     //     'handler': parseAcknowledgementArm
     // },
@@ -125,7 +125,7 @@ var command_map = {
         'description': 'Zone opened.',
         'code': '609',
         'zone': '',
-        'status': 'Open',
+        'state': 'open',
         'type': 'zone',
         'handler': parseZoneChange
     },
@@ -134,7 +134,7 @@ var command_map = {
         'description': 'Zone closed.',
         'code': '610',
         'zone': '',
-        'status': 'Close',
+        'state': 'closed',
         'type': 'zone',
         'handler': parseZoneChange
     },
@@ -371,14 +371,14 @@ var command_map = {
     },
     '896': {
         'name': 'Keybus fault',
-        'description': 'Alarm System Status Keybus fault.',
+        'description': 'Alarm System state Keybus fault.',
         'code': '896',
         'type': 'partition',
         'handler': parseGenericReceivedData
     },
     '897': {
         'name': 'Keybus restored',
-        'description': 'Alarm System Status Keybus restored.',
+        'description': 'Alarm System state Keybus restored.',
         'code': '897',
         'type': 'partition',
         'handler': parseGenericReceivedData
@@ -394,7 +394,7 @@ var command_map = {
         'name': 'Chime',
         'description': 'Indicate when Chime is ON or OFF.',
         'code': '901',
-        'status': '',
+        'state': '',
         'type': 'partition',
         'handler': parseChimeToggle
     }
