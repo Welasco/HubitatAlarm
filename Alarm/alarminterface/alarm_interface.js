@@ -1,72 +1,46 @@
-let EventEmitter = require('events')
-const FileWatcher = require("./file_watcher").FileWatcher;
-const Socket = require("./socket_client").Socket;
+const EventEmitter = require('events');
+const log = require('../tools/logger');
+const nconf = require('nconf');
+nconf.file({ file: './config/config.json' });
+const alarmType = nconf.get('alarm:alarmType');
 
-var emitter;
-class Alarm extends EventEmitter {
-    constructor(connectionType){
+var self;
+class alarm_interface extends EventEmitter {
+    constructor(){
         super();
-        emitter = this;
-        switch (alarm_type) {
-            case "dsc":
-                //console.log("switch case File_Watcher");
-                this.tail = new FileWatcher();
-                this.read_FileWatcher();
+        self = this;
+        this.init();
+    }
+    init(){
+        switch (alarmType) {
+            case 'dsc':
+                this.#dsc();
                 break;
 
-            case "honeywell":
-                this.read_Socket();
+            case 'honeywell':
+                this.#honeywell();
                 break;
             default:
                 break;
         }
-
-        //this.testEvent();
     }
-    read_FileWatcher(){
-        this.tail.on("read", function(data) {
-            emitter.emit("read",data);
+    #dsc(){
+        this.alarm = new (require('./dsc_alarm')).dsc_alarm;
+        this.alarm.on('read',function (data) {
+            self.emit('read',data);
         });
-
-        this.tail.on("error", function(error) {
-            console.log('ERROR: ', error);
-            emitter.emit("error",error);
-        });
-    }
-    read_Socket(){
-        this.socket = new Socket();
-        this.socket.on("read",function (data) {
-            emitter.emit("read",data);
+        this.alarm.on('error',function (error) {
+            self.emit('error',error);
         })
-
-        this.socket.on("error", function(error) {
-            console.log('ERROR: ', error);
-            emitter.emit("error",error);
+    }
+    #honeywell(){
+        this.alarm = new (require('./honeywell_alarm')).honeywell_alarm;
+        this.alarm.on('read',function (data) {
+            self.emit('read',data);
         });
-    }
-    send(msg){
-        switch (alarm_type) {
-            case "File_Watcher":
-                //console.log("switch case File_Watcher");
-                // this.tail = new FileWatcher();
-                // this.read_FileWatcher();
-                break;
-
-            case "Socket":
-                this.socket.send(msg);
-                break;
-            default:
-                break;
-        }
-    }
-    stop(){
-        this.tail.unwatch()
-    }
-    resume(){
-        this.tail.watch()
-    }
-    testEvent(msg){
-        this.emit("read",msg);
+        this.alarm.on('error',function (error) {
+            self.emit('error',error);
+        })
     }
 }
-exports.Alarm = Alarm
+exports.alarm_interface = alarm_interface

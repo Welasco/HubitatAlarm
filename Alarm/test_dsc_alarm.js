@@ -5,5 +5,5 @@ _dsc_alarm.on('read',function (data) {
 });
 
 //_dsc_alarm.alarmSendCode();
-setTimeout(_dsc_alarm.alarmArm, 4000);
+//setTimeout(_dsc_alarm.alarmArm, 4000);
 

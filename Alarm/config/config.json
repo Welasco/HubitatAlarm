@@ -11,7 +11,7 @@
         "port": "3001",
         "password": "user"
       },
-      "type": "dsc",
+      "alarmType": "dsc",
       "connectionType": "envisalink",
       "panelConfig": {
         "type": "discover",
