@@ -63,7 +63,7 @@ class honeywell_alarm extends EventEmitter {
             self.#parseReceivedData(data);
         });
         this.alarmConnection.on('error', function (error) {
-            log.error('[Honeywell-Alarm] alarmConnection: ERROR: ', error);
+            log.error('Honeywell-Alarm: alarmConnection: ERROR: ', error);
             self.emit('error', error);
         });
     }
@@ -71,30 +71,50 @@ class honeywell_alarm extends EventEmitter {
         data.toString('ascii').split('\r\n').forEach(function (item) {
             let alarmEvent;
             if (item.length != 0) {
+
+                //logger('RX < '+data);
+
                 var code = item;
                 if (item[0] == '%' || item[0] == '^') {
                     code = item.split(',')[0];
                     item = item.slice(item.indexOf(',') + 1, -1);
                 }
 
+
                 try {
 
                     alarmEvent = _alarmEventParser.GetCode(code,item);
                     if (typeof alarmEvent !== 'undefined'){
                         if(alarmEvent.code == 'Login:'){
-                            log.info('[Honeywell-Alarm] EnvisaLink Login requested. Sending Login information');
                             self.alarmEnvisalinkLogin();
                         }
                         else{
-                            self.emit('read', JSON.stringify(alarmEvent));
+                            self.emit('read', alarmEvent);
                         }
                     }
                 } catch (error) {
-                    log.silly('[Honeywell-Alarm] Alarm received command not mapped: '+item);
+                    log.verbose('Honeywell-Alarm: Alarm received command not mapped: '+code+' Item: '+item);
                 }
+
+                // // defined device response handler
+                // if (responseHandler && deviceResponse) {
+                //     var match = item.indexOf(deviceResponse);
+                //     if (match != -1) {
+                //         responseHandler(item);
+                //     }
+                // }
+                // else {
+                //     // generic handler
+                //     if (RESPONSE_TYPES[code]) {
+                //         responseHandler = RESPONSE_TYPES[code]['handler'];
+                //         responseHandler(item);
+                //     } else {
+                //         logger("Honeywell-Alarm: Error: ignoring invalid message code from Envisalink: " + code + ", data: " + data);
+                //     }
+                // }
             }
             else {
-                log.silly('[Honeywell-Alarm] Received invalid command: ' + item);
+                log.silly('Honeywell-Alarm: Received invalid command: ' + item);
             }
         });
     }

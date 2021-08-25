@@ -46,15 +46,15 @@ var dscSerial = function () {
         });
         dscSerialPort.on('open', function showPortOpen() {
             portStatus = 1;
-            log.info('SerialPort: Serial port open');
+            log.info('[DSC_IT100] Serial port open');
         });
         dscSerialPort.on('close', function showPortClose() {
-            log.error('SerialPort: Serial Port closed ' + linuxSerialUSBtty);
-            self.emit('close', 'SerialPort: Serial port closed.');
+            log.error('[DSC_IT100] Serial Port closed ' + linuxSerialUSBtty);
+            self.emit('close', '[DSC_IT100] Serial port closed.');
         });
         dscSerialPort.on('error', function showError(error) {
-            log.error('SerialPort: Serial port error: ' + error);
-            self.emit('error', 'SerialPort: Serial port error: '+error);
+            log.error('[DSC_IT100] Serial port error: ' + error);
+            self.emit('error', '[DSC_IT100] Serial port error: '+error);
         });
         const serialPortparser = dscSerialPort.pipe(new SerialReadline({ delimiter: '\r\n' }))
         serialPortparser.on('data', function receivedFromSerial(data) {
@@ -68,17 +68,16 @@ var dscSerial = function () {
  * @param {Stream} data - Stream buffer received from DSC-IT100
  */
  function parseReceivedData(data) {
-    log.silly('SerialPort: RAW received data: ' + data);
     let cmd = data.toString('ascii');
     if(cmd.length >= 3){
-        log.debug('SerialPort: Received Serial data: ' + data);
+        log.debug('[DSC_IT100] Received Serial data: ' + data);
         event_emit(cmd);
     }
 }
 
 // Method used to send serial data
 function sendToSerial(cmd) {
-    log.debug('SerialPort: Sending to serial port: ' + cmd);
+    log.debug('[DSC_IT100] Sending to serial port: ' + cmd);
     dscSerialPort.write(cmd);
 }
 

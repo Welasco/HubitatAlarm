@@ -1,5 +1,4 @@
 const EventEmitter = require('events');
-const log = require('../tools/logger');
 const nconf = require('nconf');
 nconf.file({ file: './config/config.json' });
 const alarmType = nconf.get('alarm:alarmType');

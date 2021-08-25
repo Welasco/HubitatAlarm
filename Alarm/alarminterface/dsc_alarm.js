@@ -4,7 +4,7 @@ const nconf = require('nconf');
 const dsc_commands = require('./dsc_commands').dsc_commands;
 const _dsc_commands = new dsc_commands();
 const alarmEventParser = require('./dsc_eventParser').dsc_eventParser;
-let _alarmEventParser = new alarmEventParser();
+const _alarmEventParser = new alarmEventParser();
 nconf.file({ file: './config/config.json' });
 
 // Global Variables
@@ -88,7 +88,7 @@ class dsc_alarm extends EventEmitter {
             self.#parseReceivedData(data);
         });
         this.alarmConnection.on('error', function (error) {
-            log.error('DSC-Alarm: alarmConnection: ERROR: ', error);
+            log.error('[DSC-Alarm] alarmConnection: ERROR: ', error);
             self.emit('error',error);
         });
     }
@@ -98,7 +98,7 @@ class dsc_alarm extends EventEmitter {
             self.#parseReceivedData(data);
         });
         this.alarmConnection.on('error', function (error) {
-            log.error('DSC-Alarm: alarmConnection: ERROR: ', error);
+            log.error('[DSC-Alarm] alarmConnection: ERROR: ', error);
             self.emit('error',error);
         });
     }
@@ -109,26 +109,26 @@ class dsc_alarm extends EventEmitter {
             if (cmdFullStr.length >= 3) {
                 let cmd = cmdFullStr.substr(0, 3);
                 try {
-                    log.silly('DSC-Alarm: Received commands: cmd: '+cmd+' cmdFullStr: '+cmdFullStr);
                     alarmEvent = _alarmEventParser.GetCode(cmd,cmdFullStr);
-                    log.verbose('DSC-Alarm: Parced command event: '+JSON.stringify(alarmEvent));
                     if (typeof alarmEvent !== 'undefined'){
                         if (alarmEvent.code == '900') {
+                            log.info('[DSC-Alarm] DSC Login requested code 900. Sending DSC Alarm password');
                             self.alarmSendCode();
                         }
                         else if (alarmEvent.login_command == '5053') {
+                            log.info('[DSC-Alarm] EnvisaLink Login requested. Sending Login information');
                             self.alarmEnvisalinkLogin();
                         }
                         else{
-                            self.emit('read', alarmEvent);
+                            self.emit('read', JSON.stringify(alarmEvent));
                         }
                     }
                 } catch (error) {
-                    log.verbose('DSC-Alarm: Alarm received command not mapped: '+cmd);
+                    log.verbose('[DSC-Alarm] Alarm received command not mapped: '+cmd);
                 }
             }
             else{
-                log.silly('DSC-Alarm: Received invalid command: '+item);
+                log.silly('[DSC-Alarm] Received invalid command: '+item);
             }
         });
     }

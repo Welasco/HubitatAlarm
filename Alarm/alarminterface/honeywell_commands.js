@@ -1,4 +1,3 @@
-const log = require('../tools/logger');
 const nconf = require('nconf');
 nconf.file({ file: './config/config.json' });
 

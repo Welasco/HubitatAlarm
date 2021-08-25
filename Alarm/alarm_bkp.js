@@ -10,40 +10,73 @@ const nconf = require('nconf');
 // Load Alarm main config file
 nconf.file({ file: './config/config.json' });
 
-var wssend;
-
 // Instantiate Alarm interface
 var _alarm = new alarm_interface();
-_alarm.on('read', function (data) {
-    log.verbose('[Alarm] Sending WSS client data: '+data);
-    wss.clients.forEach(function each(client) {
-        client.send(data);
-    });
-});
-_alarm.on('error', function (error) {
-    log.error('_alarm Error: ' + error);
-});
 
 // Alarm WebSocket implementation
 const wss = new WebSocket.Server({ server: server, path: '/wss' });
+var wssend;
 wss.on('connection', function connection(ws) {
 
-    log.verbose('[Alarm] WSS Client connected IP: ' + ws._socket.remoteAddress);
+    //log.info('WSS Client connected IP: '+req.socket.remoteAddress);
+    log.info('WSS Client connected IP: ' + ws._socket.remoteAddress);
 
     wssend = ws;
+
+    ws.send('Welcome New Client!');
 
     // Expected to received Alarm commands
     // Ex: JSON --> {"command":"alarmArmAway"}
     ws.on('message', function incoming(rcv_msg) {
-        log.verbose('[Alarm] WSS Server received message: ' + JSON.stringify(rcv_msg.toString('ascii')));
+
+        wss.clients.forEach(function each(client) {
+            //console.log("client objs: " + JSON.stringify(client, null, 2));
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
+              //client.send(message);
+            }
+        });
+
+
+        log.info('WSS received message: ' + JSON.stringify(rcv_msg.toString('ascii')));
+        let json_rcv_msg = JSON.parse(rcv_msg);
+        log.info('OBJ parse: ' + json_rcv_msg.command);
         let responseHandler = alarm_command_map[json_rcv_msg.command];
         responseHandler();
     });
 
+    // Important Note:
+    // Code used to broadcast received wss messages to all wss connected clients
+    // Not necessary for this implementation since the Alarm is the only one that generates
+    // messages that need to be broadcasted.
+    // ws.on('message', function incoming(message) {
+    //     console.log('received: %s', message);
+    //     wss.clients.forEach(function each(client) {
+    //         //console.log('client objs: ' + JSON.stringify(client, null, 2));
+    //         if (client !== ws && client.readyState === WebSocket.OPEN) {
+    //             client.send(message);
+    //         }
+    //     });
+    // });
+
     ws.on('close', function (code, reason) {
-        log.info('[Alarm] Client disconnected: ' + ws._socket.remoteAddress + ' Code: ' + code + ' Reason: ' + reason);
+        log.info('Client disconnected: ' + JSON.stringify(ws._socket.address()) + ' Code: ' + JSON.stringify(code) + ' Reason: ' + JSON.stringify(reason));
     });
 
+});
+
+_alarm.on('read', function (data) {
+    //log.info('RECEBIDO data: '+JSON.stringify(data));
+
+    try {
+        log.info('wss received from alarm: ' + JSON.stringify(data));
+        wssend.send(data);
+    } catch (error) {
+        log.error("ERROR: No WSS user connected to send data!");
+    }
+});
+
+_alarm.on('error', function (error) {
+    log.error('_alarm Error: ' + error);
 });
 
 //////////////////////////////////////////////////////////////////
@@ -197,78 +230,79 @@ function alarmDiscover() {
     return;
 }
 
-// Alarm command Handlers
+// Handlers
 function alarmArm() {
-    _alarm.alarm.alarmArm();
+    _alarm.alarm.alarmArm;
 }
 
 function alarmArmAway() {
-    _alarm.alarm.alarmArmAway();
+    log.info('CHEGOU AQUI NO HENDLER');
+    _alarm.alarm.alarmArmAway;
 }
 
 function alarmArmStay() {
-    _alarm.alarm.alarmArmStay();
+    _alarm.alarm.alarmArmStay;
 }
 
 function alarmArmNight() {
-    _alarm.alarm.alarmArmNight();
+    _alarm.alarm.alarmArmNight;
 }
 
 function descriptiveControl() {
     try {
-        _alarm.alarm.descriptiveControl();
+        _alarm.alarm.descriptiveControl;
     } catch (error) {
-        log.error('Command descriptiveControl not implemented for Honeywell alarm.');
+        log.silly('Command descriptiveControl not implemented for Honeywell alarm.');
     }
 }
 
 function alarmDisarm() {
-    _alarm.alarm.alarmDisarm();
+    _alarm.alarm.alarmDisarm;
 }
 
 function alarmChimeToggle() {
-    _alarm.alarm.alarmChimeToggle();
+    _alarm.alarm.alarmChimeToggle;
 }
 
 function alarmPanic() {
     try {
-        _alarm.alarm.alarmPanic();
+        _alarm.alarm.alarmPanic;
 
     } catch (error) {
-        log.error('Command alarmPanic not implemented for Honeywell alarm.');
+        log.silly('Command alarmPanic not implemented for Honeywell alarm.');
     }
 }
 
 function alarmFire() {
     try {
-        _alarm.alarm.alarmFire();
+        _alarm.alarm.alarmFire;
 
     } catch (error) {
-        log.error('Command alarmFire not implemented for Honeywell alarm.');
+        log.silly('Command alarmFire not implemented for Honeywell alarm.');
     }
 }
 
 function alarmAmbulance() {
     try {
-        _alarm.alarm.alarmAmbulance();
+        _alarm.alarm.alarmAmbulance;
 
     } catch (error) {
-        log.error('Command alarmAmbulance not implemented for Honeywell alarm.');
+        log.silly('Command alarmAmbulance not implemented for Honeywell alarm.');
     }
 }
 
 function alarmSetDate() {
     try {
-        _alarm.alarm.alarmSetDate();
+        _alarm.alarm.alarmSetDate;
 
     } catch (error) {
-        log.error('Command alarmSetDate not implemented for Honeywell alarm.');
+        log.silly('Command alarmSetDate not implemented for Honeywell alarm.');
     }
 }
 
 function alarmUpdate() {
     try {
-        _alarm.alarm.alarmUpdate();
+        _alarm.alarm.alarmUpdate;
 
     } catch (error) {
         log.silly('Command alarmUpdate not implemented for Honeywell alarm.');
@@ -277,40 +311,39 @@ function alarmUpdate() {
 
 function alarmSpeedKeyA() {
     try {
-        _alarm.alarm.alarmSpeedKeyA();
+        _alarm.alarm.alarmSpeedKeyA;
 
     } catch (error) {
-        log.error('Command alarmSpeedKeyA not implemented for DSC alarm.');
+        log.silly('Command alarmSpeedKeyA not implemented for DSC alarm.');
     }
 }
 
 function alarmSpeedKeyB() {
     try {
-        _alarm.alarm.alarmSpeedKeyB();
+        _alarm.alarm.alarmSpeedKeyB;
 
     } catch (error) {
-        log.error('Command alarmSpeedKeyB not implemented for DSC alarm.');
+        log.silly('Command alarmSpeedKeyB not implemented for DSC alarm.');
     }
 }
 
 function alarmSpeedKeyC() {
     try {
-        _alarm.alarm.alarmSpeedKeyC();
+        _alarm.alarm.alarmSpeedKeyC;
 
     } catch (error) {
-        log.error('Command alarmSpeedKeyC not implemented for DSC alarm.');
+        log.silly('Command alarmSpeedKeyC not implemented for DSC alarm.');
     }
 }
 
 function alarmSpeedKeyD() {
     try {
-        _alarm.alarm.alarmSpeedKeyD();
+        _alarm.alarm.alarmSpeedKeyD;
     } catch (error) {
-        log.error('Command alarmSpeedKeyD not implemented for DSC alarm.');
+        log.silly('Command alarmSpeedKeyD not implemented for DSC alarm.');
     }
 }
 
-// Alarm command handlers map
 var alarm_command_map = {
     'alarmArm': alarmArm,
     'alarmArmAway': alarmArmAway,
@@ -337,4 +370,12 @@ log.info('HTTP Endpoint: All HTTP endpoints loaded');
 ////////////////////////////////////////
 let httpport = nconf.get('httpport');
 server.listen(httpport);
-log.info('[Alarm] HTTP Endpoint: HTTP Server started at port: ' + httpport);
+log.info('HTTP Endpoint: HTTP Server Created at port: ' + httpport);
+
+// log.error('Writing log error');
+// log.warn('Writing log warn');
+// log.info('Writing log info');
+// log.http('Writing log http');
+// log.verbose('Writing log verbose');
+// log.debug('Writing log debug');
+// log.silly('Writing log silly');

@@ -1,4 +1,3 @@
-const { Logform } = require('winston');
 const log = require('../tools/logger');
 
 class honeywell_eventParser {
@@ -31,12 +30,9 @@ function ignoreEvent(params) {
 
 var panel = {alpha: '', timer: [], partition: 1, zones: []};
 function keypad_update(code,data) {
-    //logger('Execute keypad_update: '+data);
-    //log.warn('Data: '+data);
     var map = data.split(',');
-    //log.warn('Map.length: '+map.length+' IndexOf: '+data.indexOf('%'));
     if (map.length != 5 || data.indexOf('%') != -1) {
-        log.error("EventParser: Error: ignoring invalid data format from Envisalink: " + data);
+        log.error("[Honeywell-EventParser] Error: ignoring invalid data format from Envisalink: " + data);
         return;
     }
 
@@ -47,7 +43,6 @@ function keypad_update(code,data) {
     msg.beep = VIRTUAL_KEYPAD_BEEP[map[3]];
     msg.alpha = map[4].trim();
     msg.dscCode = getDscCode(msg.flags);
-    //log.warn('msg.dscCode: '+msg.dscCode);
 
     //////////
     // ZONE UPDATE
@@ -114,7 +109,6 @@ function keypad_update(code,data) {
 }
 
 function zone_timer_dump(data) {
-    //logger('Execute zone_timer_dump: '+data);
     var queue = [];
 
     // Swap the couples of every four bytes (little endian to big endian)
@@ -138,7 +132,6 @@ function zone_timer_dump(data) {
                 state: 'closed'
             });
         }
-        //logger(JSON.stringify(msg));
     }
 
     updateThrottler(queue);
@@ -161,7 +154,6 @@ var return_json = {
 function updateZone(partitionNumber, zoneNumber, state) {
     panel.zones[zoneNumber] = state;
 
-    //var msg = JSON.stringify({ type: 'zone', partition: partitionNumber, zone: zoneNumber, state: state });
     return_json.type = 'zone';
     return_json.partition = partitionNumber;
     return_json.zone = (zoneNumber.toString().length == 1) ? '00'+zoneNumber.toString() : (zoneNumber.toString().length == 2)? '0'+zoneNumber.toString(): zoneNumber.toString();
@@ -169,8 +161,7 @@ function updateZone(partitionNumber, zoneNumber, state) {
     return_json.name = 'Zone Update';
     return_json.description = 'Event used for Zone update open/closed';
     return_json.partition = '';
-    log.info('Honeywell Zone Event: '+JSON.stringify(return_json));
-    //notify(msg);
+    log.info('[Honeywell-EventParser] Zone Event: '+JSON.stringify(return_json));
     return return_json;
 }
 
@@ -185,8 +176,7 @@ function updatePartition(partitionNumber, state, alpha) {
     return_json.name = 'Panel Update';
     return_json.description = alpha;
     return_json.code = '';
-    log.info('Honeywell Panel Event: '+JSON.stringify(return_json));
-    //notify(msg);
+    log.info('[Honeywell-EventParser] Panel Event: '+JSON.stringify(return_json));
     return return_json;
 }
 

@@ -84,3 +84,10 @@ module.exports.verbose = verbose;
 module.exports.debug = debug;
 module.exports.silly = silly;
 
+// log.error('Writing log error');
+// log.warn('Writing log warn');
+// log.info('Writing log info');
+// log.http('Writing log http');
+// log.verbose('Writing log verbose');
+// log.debug('Writing log debug');
+// log.silly('Writing log silly');
