@@ -1,1 +1,0 @@
-{"type":"","command":"","authors":"Victor Santana","version":"0.0.1","main":"wss.js","scripts":{"start":"node wss.js"},"dependencies":{"tail":"2.2.3","express":"4.17.1","ws":"7.5.3"}}
