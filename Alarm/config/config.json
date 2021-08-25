@@ -1,0 +1,61 @@
+{
+    "httpport": 3000,
+    "alarm": {
+      "alarmpassword": "1234",
+      "dsc_it100":{
+        "linuxSerialUSBtty": "/dev/ttyUSB0",
+        "baudRate": 9600
+      },
+      "envisalink":{
+        "ip": "127.0.0.1",
+        "port": "3001",
+        "password": "user"
+      },
+      "alarmType": "honeywell",
+      "connectionType": "envisalink",
+      "panelConfig": {
+        "type": "discover",
+        "zones": [
+          {
+            "zone": "001",
+            "type": "contact",
+            "name": "Alarm Zone001"
+          },
+          {
+            "zone": "002",
+            "type": "contact",
+            "name": "Alarm Zone002"
+          },
+          {
+            "zone": "003",
+            "type": "contact",
+            "name": "Alarm Zone003"
+          },
+          {
+            "zone": "004",
+            "type": "contact",
+            "name": "Alarm Zone004"
+          },
+          {
+            "zone": "005",
+            "type": "contact",
+            "name": "Alarm Zone005"
+          },
+          {
+            "zone": "006",
+            "type": "contact",
+            "name": "Alarm Zone006"
+          }
+        ]
+      }
+    },
+    "notify": {
+      "address": "192.168.2.200",
+      "port": "39500"
+    },
+    "log":{
+        "loglevel": "debug",
+        "logtofile": true,
+        "logfilepath": "alarm.log"
+    }
+  }

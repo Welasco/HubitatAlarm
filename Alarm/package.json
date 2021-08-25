@@ -1,0 +1,34 @@
+{
+  "author": {
+    "name": "Victor Santana",
+    "url": "https://github.com/Welasco",
+    "email": "victor@hepoca.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Welasco/HubitatAlarm.git"
+  },
+  "keywords": [
+    "Alarm Hubitat",
+    "Alarm automation",
+    "Home automation alarm"
+  ],
+  "license": "MIT",
+  "name": "alarm",
+  "version": "0.0.1",
+  "description": "Alarm implementation for Hubitat",
+  "main": "alarm.js",
+  "homepage": "https://github.com/Welasco/HubitatAlarm",
+  "scripts": {
+    "start": "node alarm.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "http": "0.0.0",
+    "serialport": "^9.0.1",
+    "nconf": "^0.10.0",
+    "winston": "^3.3.3",
+    "tail": "^2.2.3",
+    "ws": "^8.0.0"
+  }
+}
