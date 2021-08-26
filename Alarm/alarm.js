@@ -4,18 +4,26 @@ const app = express()
 const server = require('http').createServer(app);
 const WebSocket = require('ws');
 const alarm_interface = require('./alarminterface/alarm_interface').alarm_interface;
+const http_handler = require('./tools/http_handler').http_handler;
 const log = require('./tools/logger');
 const nconf = require('nconf');
 
 // Load Alarm main config file
 nconf.file({ file: './config/config.json' });
 
+const _http_handler = new http_handler();
+const communicationType = nconf.get('alarm:communicationType');
 var wssend;
 
 // Instantiate Alarm interface
 var _alarm = new alarm_interface();
 _alarm.on('read', function (data) {
     log.verbose('[Alarm] Sending WSS client data: '+data);
+    // Check if communicationType is set to api if so callBack with received data
+    if (communicationType == 'api') {
+        _http_handler.notify(data);
+    }
+    // Broadcast all Alarm received data to all WSS connected clients
     wss.clients.forEach(function each(client) {
         client.send(data);
     });
