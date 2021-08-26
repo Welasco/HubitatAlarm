@@ -13,6 +13,7 @@
       },
       "alarmType": "honeywell",
       "connectionType": "envisalink",
+      "communicationType":"wss",
       "panelConfig": {
         "type": "discover",
         "zones": [
@@ -50,8 +51,8 @@
       }
     },
     "notify": {
-      "address": "192.168.2.200",
-      "port": "39500"
+      "address": "127.0.0.1",
+      "port": "3002"
     },
     "log":{
         "loglevel": "debug",
