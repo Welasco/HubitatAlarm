@@ -45,8 +45,4 @@ jobs:
         project-url: "https://github.com/Welasco/HubitatAlarm/projects/1"
         column-name: "In progress"
         label-name: "In progress"
-<<<<<<< HEAD
-        columns-to-ignore: ""        
-=======
         columns-to-ignore: ""
->>>>>>> Alarm_V1
