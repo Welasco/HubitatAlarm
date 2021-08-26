@@ -36,6 +36,7 @@ wss.on('connection', function connection(ws) {
     // Ex: JSON --> {"command":"alarmArmAway"}
     ws.on('message', function incoming(rcv_msg) {
         log.verbose('[Alarm] WSS Server received message: ' + JSON.stringify(rcv_msg.toString('ascii')));
+        let json_rcv_msg = JSON.parse(rcv_msg);
         let responseHandler = alarm_command_map[json_rcv_msg.command];
         responseHandler();
     });
