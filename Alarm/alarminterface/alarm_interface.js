@@ -4,6 +4,9 @@ nconf.file({ file: './config/config.json' });
 const alarmType = nconf.get('alarm:alarmType');
 
 var self;
+// This class can only produce one instance of an object
+// If an object from this class get created twice the Alarm access will fail
+// Neither DSC-IT100 or Envisalink allow multiple connections.
 class alarm_interface extends EventEmitter {
     constructor(){
         super();
@@ -12,11 +15,11 @@ class alarm_interface extends EventEmitter {
     }
     init(){
         switch (alarmType) {
-            case 'dsc':
+            case 'DSC':
                 this.#dsc();
                 break;
 
-            case 'honeywell':
+            case 'Honeywell':
                 this.#honeywell();
                 break;
             default:

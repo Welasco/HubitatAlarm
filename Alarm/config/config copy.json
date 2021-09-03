@@ -4,7 +4,7 @@
     "alarmpassword": "1234",
     "SHM": true,
     "dsc_it100": {
-      "linuxSerialUSBtty": "",
+      "linuxSerialUSBtty": "/dev/ttyUSB0",
       "baudRate": 9600
     },
     "envisalink": {
@@ -22,26 +22,44 @@
           "zone": "001",
           "type": "contact",
           "networkId": "zone-001",
-          "name": "ZoneOffice"
+          "name": "Alarm Zone001"
         },
         {
           "zone": "002",
           "type": "contact",
           "networkId": "zone-002",
-          "name": "ZoneKitchen"
+          "name": "Alarm Zone002"
         },
         {
           "zone": "003",
           "type": "contact",
           "networkId": "zone-003",
-          "name": "ZoneMaster"
+          "name": "Alarm Zone003"
+        },
+        {
+          "zone": "004",
+          "type": "contact",
+          "networkId": "zone-004",
+          "name": "Alarm Zone004"
+        },
+        {
+          "zone": "005",
+          "type": "contact",
+          "networkId": "zone-005",
+          "name": "Alarm Zone005"
+        },
+        {
+          "zone": "006",
+          "type": "contact",
+          "networkId": "zone-006",
+          "name": "Alarm Zone006"
         }
       ]
     }
   },
   "notify": {
-    "address": "192.168.2.201",
-    "port": "39501"
+    "address": "127.0.0.1",
+    "port": "3002"
   },
   "log": {
     "loglevel": "debug",

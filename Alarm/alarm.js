@@ -7,6 +7,7 @@ const alarm_interface = require('./alarminterface/alarm_interface').alarm_interf
 const http_handler = require('./tools/http_handler').http_handler;
 const log = require('./tools/logger');
 const nconf = require('nconf');
+const _checkSchema = require('./tools/checkJsonSchema').checkJsonSchema;
 
 // Load Alarm main config file
 nconf.file({ file: './config/config.json' });
@@ -20,7 +21,7 @@ var _alarm = new alarm_interface();
 _alarm.on('read', function (data) {
     log.verbose('[Alarm] Sending WSS client data: '+data);
     // Check if communicationType is set to api if so callBack with received data
-    if (communicationType == 'api') {
+    if (communicationType == 'API') {
         _http_handler.notify(data);
     }
     // Broadcast all Alarm received data to all WSS connected clients
@@ -29,7 +30,7 @@ _alarm.on('read', function (data) {
     });
 });
 _alarm.on('error', function (error) {
-    log.error('_alarm Error: ' + error);
+    log.error('[Alarm] _alarm Error: ' + error);
 });
 
 // Alarm WebSocket implementation
@@ -43,10 +44,16 @@ wss.on('connection', function connection(ws) {
     // Expected to received Alarm commands
     // Ex: JSON --> {"command":"alarmArmAway"}
     ws.on('message', function incoming(rcv_msg) {
-        log.verbose('[Alarm] WSS Server received message: ' + JSON.stringify(rcv_msg.toString('ascii')));
+        //log.verbose('[Alarm] WSS Server received message: ' + rcv_msg.toString('ascii'));
         let json_rcv_msg = JSON.parse(rcv_msg);
-        let responseHandler = alarm_command_map[json_rcv_msg.command];
-        responseHandler();
+        if (_checkSchema('commandWSSSchema',json_rcv_msg)) {
+            log.debug('[Alarm] WSS received a valid command: '+json_rcv_msg.command);
+            let responseHandler = alarm_command_map[json_rcv_msg.command];
+            responseHandler();
+        }
+        else{
+            log.error('[Alarm] WSS received an invalid json schema');
+        }
     });
 
     ws.on('close', function (code, reason) {
@@ -58,288 +65,100 @@ wss.on('connection', function connection(ws) {
 //////////////////////////////////////////////////////////////////
 // Build Express Server - Creating Endpoints
 //////////////////////////////////////////////////////////////////
-
+//app.use(express.json());
 // Used only to check if Alarm is running
 app.get('/', function (req, res) {
     res.send('<html><body><h1>Hubitat Alarm Running</h1></body></html>');
 });
 
-// Used to arm the alarm using the alarm password
-app.get('/api/alarmArm', function (req, res) {
-    alarmArm();
-    res.end();
-});
+app.get('/api/:command',function (req, res) {
+    try {
+        let responseHandler = alarm_command_map[req.params.command];
+        responseHandler();
+        res.end();
+    } catch (error) {
+        res.status(404).send("Alarm command not found: "+req.params.command);
+    }
+})
 
-// Used to arm the alarm in Away Mode (password not required)
-app.get('/api/alarmArmAway', function (req, res) {
-    alarmArmAway();
-    res.end();
-});
-
-// Used to arm the alarm in Stay Mode (password not required)
-app.get('/api/alarmArmStay', function (req, res) {
-    alarmArmStay();
-    res.end();
-});
-
-// Used to arm the alarm in Night Mode (password required)
-app.get('/api/alarmArmNight', function (req, res) {
-    alarmArmNight();
-    res.end();
-});
-
-// Used to enable descriptive control
-app.get('/api/descriptiveControl', function (req, res) {
-    descriptiveControl();
-});
-
-// Used to disarm the alarm (need a password)
-app.get('/api/alarmDisarm', function (req, res) {
-    alarmDisarm();
-    res.end();
-});
-
-// Used to enable or disable Chime
-app.get('/api/alarmChimeToggle', function (req, res) {
-    alarmChimeToggle();
-    res.end();
-});
-
-// Used to activate Panic Siren
-app.get('/api/alarmPanic', function (req, res) {
-    alarmPanic();
-});
-
-// Used to activate Fire Siren
-app.get('/api/alarmFire', function (req, res) {
-    alarmFire();
-});
-
-// Used to activate Ambulance
-app.get('/api/alarmAmbulance', function (req, res) {
-    alarmAmbulance();
-});
-
-// Used to Set Alarm Date and Time
-app.get('/api/alarmSetDate', function (req, res) {
-    alarmSetDate();
-});
-
-// Used to Set Alarm Date and Time
-app.get('/api/alarmUpdate', function (req, res) {
-    alarmUpdate();
-});
-
-app.get('/api/alarmSpeedKeyA', function (req, res) {
-    alarmSpeedKeyA();
-});
-
-app.get('/api/alarmSpeedKeyB', function (req, res) {
-    alarmSpeedKeyB();
-});
-
-app.get('/api/alarmSpeedKeyC', function (req, res) {
-    alarmSpeedKeyC();
-});
-
-app.get('/api/alarmSpeedKeyD', function (req, res) {
-    alarmSpeedKeyD();
-});
+// Alarm command handlers map
+const alarm_command_map = {
+    'alarmArm': _alarm.alarm.alarmArm,
+    'alarmArmAway': _alarm.alarm.alarmArmAway,
+    'alarmArmStay': _alarm.alarm.alarmArmStay,
+    'alarmArmNight': _alarm.alarm.alarmArmNight,
+    'descriptiveControl': _alarm.alarm.descriptiveControl,
+    'alarmDisarm': _alarm.alarm.alarmDisarm,
+    'alarmChimeToggle': _alarm.alarm.alarmChimeToggle,
+    'alarmPanic': _alarm.alarm.alarmPanic,
+    'alarmFire': _alarm.alarm.alarmFire,
+    'alarmAmbulance': _alarm.alarm.alarmAmbulance,
+    'alarmSetDate': _alarm.alarm.alarmSetDate,
+    'alarmUpdate': _alarm.alarm.alarmUpdate,
+    'alarmSpeedKeyA': _alarm.alarm.alarmSpeedKeyA,
+    'alarmSpeedKeyB': _alarm.alarm.alarmSpeedKeyB,
+    'alarmSpeedKeyC': _alarm.alarm.alarmSpeedKeyC,
+    'alarmSpeedKeyD': _alarm.alarm.alarmSpeedKeyD
+}
 
 /**
  * Subscribe route used by Hubitat Hub to register for callback/notifications and write to config.json
  * @param {String} host - The Hubitat Hub IP address and port number
  */
-app.get('/subscribe/:host', function (req, res) {
-    let parts = req.params.host.split(':');
-    nconf.set('notify:address', parts[0]);
-    nconf.set('notify:port', parts[1]);
-    nconf.save(function (err) {
-        if (err) {
-            log.error('Subscribe: Configuration error: ' + err.message);
-            res.status(500).json({ error: 'Configuration error: ' + err.message });
-            return;
-        }
-    });
-    res.end();
-    log.info('Subscribe: Hubitat IpAddress: ' + parts[0] + ' Port: ' + parts[1]);
-});
-
-// Used to save the Alarm password coming from Hubitat App
-app.get('/config/:host', function (req, res) {
-    let parts = req.params.host;
-    if (parts != 'null') {
-        nconf.set('alarm:alarmpassword', parts);
+app.post('/subscribe', express.json({type: '*/*'}), function (req, res) {
+    log.info('[Alarm] Subscribe HUB: '+JSON.stringify(req.body));
+    if (_checkSchema('subscribeSchema',req.body)) {
+        nconf.set('notify', req.body);
         nconf.save(function (err) {
             if (err) {
-                log.error('SaveConfig: Configuration error: ' + err.message);
-                res.status(500).json({ error: 'Configuration error: ' + err.message });
+                log.error('[Alarm] Subscribe  Config error: ' + err.message);
+                res.status(500).json({ error: '[Alarm] Subscribe Config error: ' + err.message });
                 return;
             }
         });
-        log.info('SaveConfig: Alarm Panel Code Saved: ' + parts);
-        alarmPassword = nconf.get('alarm:alarmpassword');
-        log.info('SaveConfig: Alarm Panel Reloading Config File ' + alarmPassword);
-
+        log.debug('[Alarm] Received a valid subscribed JSON. Configuration saved.');
     }
-    else {
-        log.error('SaveConfig: Failed to save Alarm Panel Code password cannot be null');
+    else{
+        log.error('[Alarm] Invalid subscribed Schema');
+        res.status(500).json({ error: '[Alarm] Invalid subscribed Schema'});
     }
     res.end();
 });
 
-/**
- * discover
- */
-// Used to send all zones back to Hubitat
-app.get('/discover', function (req, res) {
-    alarmDiscover();
+// Used to save the Alarm password coming from Hubitat App
+app.get('/config', function (req, res) {
+    if (nconf.get('alarm')) {
+        log.info("[Alarm] Sending alarm config: " + JSON.stringify(nconf.get('alarm')));
+        res.send(JSON.stringify(nconf.get('alarm')));
+    } else {
+        res.status(500).send('[Alarm] alarm section in config.json not set');
+        log.error('[Alarm] alarm section in config.json not set');
+    }
+    res.end();
 });
 
-function alarmDiscover() {
-    if (nconf.get('dscalarm:panelConfig')) {
-        notify(JSON.stringify(nconf.get('dscalarm:panelConfig')));
-        logger("AlarmDiscover", "Seding zones back: " + JSON.stringify(nconf.get('dscalarm:panelConfig')));
-    } else {
-        logger("AlarmDiscover", "PanelConfig not set.");
+// Used to save alarm configuration settings
+app.post('/config', express.json({type: '*/*'}), function (req, res) {
+    log.info('[Alarm] Received configuration: '+JSON.stringify(req.body));
+    if (_checkSchema('alarmConfigSchema',req.body)) {
+        nconf.set('alarm', req.body);
+        nconf.save(function (err) {
+            if (err) {
+                log.error('[Alarm] Config error: ' + err.message);
+                res.status(500).json({ error: '[Alarm] Config error: ' + err.message });
+                return;
+            }
+        });
+        log.debug('[Alarm] Received a valid config.json. Configuration saved.');
     }
-    return;
-}
-
-// Alarm command Handlers
-function alarmArm() {
-    _alarm.alarm.alarmArm();
-}
-
-function alarmArmAway() {
-    _alarm.alarm.alarmArmAway();
-}
-
-function alarmArmStay() {
-    _alarm.alarm.alarmArmStay();
-}
-
-function alarmArmNight() {
-    _alarm.alarm.alarmArmNight();
-}
-
-function descriptiveControl() {
-    try {
-        _alarm.alarm.descriptiveControl();
-    } catch (error) {
-        log.error('Command descriptiveControl not implemented for Honeywell alarm.');
+    else{
+        log.error('[Alarm] Invalid Schema');
+        res.status(500).json({ error: '[Alarm] Invalid Schema'});
     }
-}
+    res.end();
+});
 
-function alarmDisarm() {
-    _alarm.alarm.alarmDisarm();
-}
-
-function alarmChimeToggle() {
-    _alarm.alarm.alarmChimeToggle();
-}
-
-function alarmPanic() {
-    try {
-        _alarm.alarm.alarmPanic();
-
-    } catch (error) {
-        log.error('Command alarmPanic not implemented for Honeywell alarm.');
-    }
-}
-
-function alarmFire() {
-    try {
-        _alarm.alarm.alarmFire();
-
-    } catch (error) {
-        log.error('Command alarmFire not implemented for Honeywell alarm.');
-    }
-}
-
-function alarmAmbulance() {
-    try {
-        _alarm.alarm.alarmAmbulance();
-
-    } catch (error) {
-        log.error('Command alarmAmbulance not implemented for Honeywell alarm.');
-    }
-}
-
-function alarmSetDate() {
-    try {
-        _alarm.alarm.alarmSetDate();
-
-    } catch (error) {
-        log.error('Command alarmSetDate not implemented for Honeywell alarm.');
-    }
-}
-
-function alarmUpdate() {
-    try {
-        _alarm.alarm.alarmUpdate();
-
-    } catch (error) {
-        log.silly('Command alarmUpdate not implemented for Honeywell alarm.');
-    }
-}
-
-function alarmSpeedKeyA() {
-    try {
-        _alarm.alarm.alarmSpeedKeyA();
-
-    } catch (error) {
-        log.error('Command alarmSpeedKeyA not implemented for DSC alarm.');
-    }
-}
-
-function alarmSpeedKeyB() {
-    try {
-        _alarm.alarm.alarmSpeedKeyB();
-
-    } catch (error) {
-        log.error('Command alarmSpeedKeyB not implemented for DSC alarm.');
-    }
-}
-
-function alarmSpeedKeyC() {
-    try {
-        _alarm.alarm.alarmSpeedKeyC();
-
-    } catch (error) {
-        log.error('Command alarmSpeedKeyC not implemented for DSC alarm.');
-    }
-}
-
-function alarmSpeedKeyD() {
-    try {
-        _alarm.alarm.alarmSpeedKeyD();
-    } catch (error) {
-        log.error('Command alarmSpeedKeyD not implemented for DSC alarm.');
-    }
-}
-
-// Alarm command handlers map
-var alarm_command_map = {
-    'alarmArm': alarmArm,
-    'alarmArmAway': alarmArmAway,
-    'alarmArmStay': alarmArmStay,
-    'alarmArmNight': alarmArmNight,
-    'descriptiveControl': descriptiveControl,
-    'alarmDisarm': alarmDisarm,
-    'alarmChimeToggle': alarmChimeToggle,
-    'alarmPanic': alarmPanic,
-    'alarmFire': alarmFire,
-    'alarmAmbulance': alarmAmbulance,
-    'alarmSetDate': alarmSetDate,
-    'alarmUpdate': alarmUpdate,
-    'alarmSpeedKeyA': alarmSpeedKeyA,
-    'alarmSpeedKeyB': alarmSpeedKeyB,
-    'alarmSpeedKeyC': alarmSpeedKeyC,
-    'alarmSpeedKeyD': alarmSpeedKeyD
-}
-
-log.info('HTTP Endpoint: All HTTP endpoints loaded');
+log.info('[Alarm] HTTP Endpoint: All HTTP endpoints loaded');
 
 ////////////////////////////////////////
 // Creating Server
