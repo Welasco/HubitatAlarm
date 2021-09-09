@@ -47,7 +47,7 @@ class envisalink extends EventEmitter {
         });
     }
     sendCommand(cmd){
-        log.debug('[EnvisaLink] Sending to IP: '+envisalink_ip+' Port: ' + envisalink_port);
+        log.debug('[EnvisaLink] Sending '+cmd.trim()+' to IP: '+envisalink_ip+' Port: ' + envisalink_port);
         self.net_client.write(cmd);
     }
 }

@@ -22,11 +22,11 @@ class dsc_alarm extends EventEmitter {
     }
     init() {
         switch (connectionType) {
-            case 'it100':
+            case 'DSC-IT100':
                 this.#dsc_it100();
                 break;
 
-            case 'envisalink':
+            case 'Envisalink':
                 this.#dsc_envisalink();
                 break;
             default:
