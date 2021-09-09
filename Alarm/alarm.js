@@ -19,12 +19,14 @@ var wssend;
 // Instantiate Alarm interface
 var _alarm = new alarm_interface();
 _alarm.on('read', function (data) {
-    log.verbose('[Alarm] Sending WSS client data: '+data);
+
     // Check if communicationType is set to api if so callBack with received data
-    if (communicationType == 'API') {
+    if (nconf.get('alarm:communicationType') == 'API') {
+        log.verbose('[Alarm] Sending API client data: '+data);
         _http_handler.notify(data);
     }
     // Broadcast all Alarm received data to all WSS connected clients
+    log.verbose('[Alarm] Sending WSS client data: '+data);
     wss.clients.forEach(function each(client) {
         client.send(data);
     });
@@ -48,8 +50,13 @@ wss.on('connection', function connection(ws) {
         let json_rcv_msg = JSON.parse(rcv_msg);
         if (_checkSchema('commandWSSSchema',json_rcv_msg)) {
             log.debug('[Alarm] WSS received a valid command: '+json_rcv_msg.command);
-            let responseHandler = alarm_command_map[json_rcv_msg.command];
-            responseHandler();
+            try{
+                let responseHandler = alarm_command_map[json_rcv_msg.command];
+                responseHandler();
+            }
+            catch{
+                log.info('[Alarm] WSS received a command thats not implemented');
+            }
         }
         else{
             log.error('[Alarm] WSS received an invalid json schema');

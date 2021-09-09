@@ -38,7 +38,7 @@ var clientSocket = function(){
 var obj_clientSocket = new clientSocket();
 obj_clientSocket.init();
 
-var codes = ['500','50003129','5000332B','50003028','501','505','5053','609001','610002','621','622','650','651','652','654','655','656','658','659','670','672','673','700','750','800','801','802','803','806','807','810','811','812','813','821','822','829','830','840','841','842','843','896','897','900','901'];
+var codes = ['609001','609002','609003','610001','610002','610003'];
 var i = 0;
 var interval = setInterval(function () {
     //console.log(('r:'+codes[i]+'\r\n').toString('ascii'));
@@ -50,7 +50,7 @@ var interval = setInterval(function () {
         i=0;
     }
 
-}, 5000);
+}, 2000);
 
 
 // var interval = setInterval(function () {

@@ -1,360 +1,277 @@
-/**
- *  DSCAlarmDeviceType
- *
- *  Author: Victor Santana
- *  
- *  Date: 07/11/2021
- */
-
-
 metadata {
-    definition (name: "DSCAlarmV2 Alarm Panel", namespace: "DSCAlarmV2", author: "victor@hepoca.com") {
-        capability "Alarm"
-        capability "Switch"
-        capability "Motion Sensor"
-        capability "Contact Sensor"
-        capability "Refresh"
-        
-        attribute "alarmStatus", "string"
-        attribute "zone1", "string"     
-        attribute "zone2", "string"
-        attribute "zone3", "string"
-        attribute "zone4", "string"
-        attribute "zone5", "string"
-        attribute "zone6", "string"
-        attribute "awaySwitch", "string"
-        attribute "homeSwitch", "string"
-        attribute "nightSwitch", "string"
-        attribute "panic", "string"
-        attribute "systemStatus", "string"
-        attribute "chime", "string"
+  definition (name: "Hubitat Alarm Panel", namespace: "hubitatalarm", author: "victor@hepoca.com") {
+    capability "Alarm"
+    capability "Switch"
+    capability "Refresh"
 
-        command "armAway"
-        command "armHome"
-        command "armNight"
-        command "disarm"
-        command "chimeToggle"
-        command "alarmSetDate"
-    }
+    attribute "alarmStatus", "string"
+    attribute "systemStatus", "string"
+    attribute "chime", "string"
+
+    command "armAway"
+    command "armHome"
+    command "armNight"
+    command "disarm"
+    command "chimeToggle"
+    command "alarmSetDate"
+  }
 }
 
-
-def dscalarmparse(String description) {
-    def stateToDisplay
-    def msg = description
-    parent.writeLog("info","DSC AlarmPanel:  Motion - Processing command: $msg")
-    
-    if ( msg.length() >= 4 ) {
-        if ( msg.substring(0, 2) == "RD" ) {
-            if (msg[3] == "0") {
-                parent.writeLog("info","DSC AlarmPanel: RD - Alarm notready")
-                sendEvent(name: "alarmStatus", value: "notready")
-                sendEvent(name: "systemStatus", value: "notReady")
-                sendEvent(name: "awaySwitch", value: "off")
-                sendEvent(name: "staySwitch", value: "off")
-                sendEvent(name: "nightSwitch", value: "off")
-                sendEvent(name: "contact", value: "open")
-            }
-            else {
-                parent.writeLog("info","DSC AlarmPanel: RD - Alarm ready")
-                sendEvent(name: "alarmStatus", value: "ready")
-                sendEvent(name: "awaySwitch", value: "off")
-                sendEvent(name: "staySwitch", value: "off")
-                sendEvent(name: "nightSwitch", value: "off")
-                sendEvent(name: "switch", value: "off")
-                sendEvent(name: "contact", value: "open")
-                sendEvent(name: "systemStatus", value: "noEvents")
-            }
-        // Process arm update
-        } else if ( msg.substring(0, 2) == "AR" ) {
-            if (msg[3] == "0") {
-                parent.writeLog("info","DSC AlarmPanel: AR - Alarm disarmed")
-                parent.updateAlarmSystemStatus("disarmed")
-                sendEvent(name: "systemStatus", value: "disarmed")
-                sendEvent(name: "alarmStatus", value: "disarmed") 
-                sendEvent(name: "awaySwitch", value: "off")
-                sendEvent(name: "staySwitch", value: "off")
-                sendEvent(name: "nightSwitch", value: "off")
-                sendEvent(name: "switch", value: "off")
-                sendEvent(name: "contact", value: "open")
-            }
-            else if (msg[3] == "1") {
-                if (msg[5] == "0") {
-                    parent.writeLog("info","DSC AlarmPanel: AR - Alarm Away")
-                    parent.updateAlarmSystemStatus("armedAway")
-                    sendEvent(name: "alarmStatus", value: "armedAway")
-                    sendEvent(name: "awaySwitch", value: "on")
-                    sendEvent(name: "staySwitch", value: "off")
-                    sendEvent(name: "nightSwitch", value: "off")
-                    sendEvent(name: "switch", value: "on")
-                    sendEvent(name: "contact", value: "closed")
-                }
-                else if (msg[5] == "2") {
-                    parent.writeLog("info","DSC AlarmPanel: AR - Alarm Stay/Home")
-                    parent.updateAlarmSystemStatus("armedHome")
-                    sendEvent(name: "alarmStatus", value: "armedHome")
-                    sendEvent(name: "awaySwitch", value: "off")
-                    sendEvent(name: "staySwitch", value: "on")
-                    sendEvent(name: "nightSwitch", value: "off")
-                    sendEvent(name: "switch", value: "on")
-                    sendEvent(name: "contact", value: "closed")
-                }
-                else if (msg[5] == "4") {
-                    parent.writeLog("info","DSC AlarmPanel: AR - Alarm Night")
-                    parent.updateAlarmSystemStatus("armedNight")
-                    sendEvent(name: "alarmStatus", value: "armedNight")
-                    sendEvent(name: "awaySwitch", value: "off")
-                    sendEvent(name: "staySwitch", value: "off")
-                    sendEvent(name: "nightSwitch", value: "on")
-                    sendEvent(name: "switch", value: "on")
-                    sendEvent(name: "contact", value: "closed")
-                }                
-            }
-            else if (msg[3] == "2") {
-                parent.writeLog("info","DSC AlarmPanel: AR - Alarm Arming")
-                sendEvent(name: "systemStatus", value: "arming")
-            }
-            else if (msg[3] == "3") {
-               parent.writeLog("info","DSC AlarmPanel: AR - Alarm Armed")
-               sendEvent(name: "systemStatus", value: "armed")
-               if(parent.getalarmSystemStatus() == "disarmed" || parent.getalarmSystemStatus() == "disarmAll"){
-                   parent.writeLog("info","DSC AlarmPanel: AR - Alarm Armed from Keypayd")
-                   parent.updateAlarmSystemStatus("armedAway")
-               }
-            }            
-        } else if ( msg.substring(0, 2) == "SY" ) {
-         // Process various system statuses
-            if ( msg.substring(3, 6) == "658")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status Keypad Lockout")
-                sendEvent(name: "systemStatus", value: "System Status\nKeypad Lockout")
-            }
-            else if ( msg.substring(3, 6) == "659")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Keypad Blanking")
-                sendEvent(name: "systemStatus", value: "keypadBlanking")
-            }            
-            else if ( msg.substring(3, 6) == "670")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm Invalid Access Code")
-                sendEvent(name: "systemStatus", value: "System Status\nInvalid Access Code")
-            }
-            else if ( msg.substring(3, 6) == "672")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status Failed to Arm")
-                sendEvent(name: "systemStatus", value: "System Status\nFailed to arm")
-            }
-            else if ( msg.substring(3, 6) == "673")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Partition Busy")
-                sendEvent(name: "systemStatus", value: "partitionBusy")
-            }            
-            else if ( msg.substring(3, 6) == "802")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status Panel AC Trouble")
-                sendEvent(name: "systemStatus", value: "System Status\nPanel AC Trouble")
-            }
-            else if ( msg.substring(3, 6) == "803")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status Panel AC Trouble Rest")
-                sendEvent(name: "systemStatus", value: "System Status\nPanel AC Trouble Rest")
-            }
-            else if ( msg.substring(3, 6) == "806")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status System Bell Trouble")
-                sendEvent(name: "systemStatus", value: "System Status\nSystem Bell Trouble")
-            }
-            else if ( msg.substring(3, 6) == "807")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status System Bell Trouble Rest")
-                sendEvent(name: "systemStatus", value: "System Status\nSystem Bell Trouble Rest")
-            }
-            else if ( msg.substring(3, 6) == "810")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status TLM line 1 Trouble")
-                sendEvent(name: "systemStatus", value: "System Status\nTLM line 1 Trouble")
-            }
-            else if ( msg.substring(3, 6) == "811")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status TLM line 1 Trouble Rest")
-                sendEvent(name: "systemStatus", value: "System Status\nTLM line 1 Trouble Rest")
-            }
-            else if ( msg.substring(3, 6) == "812")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status TLM line 2 Trouble")
-                sendEvent(name: "systemStatus", value: "System Status\nTLM line 2 Trouble")
-            }
-            else if ( msg.substring(3, 6) == "813")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status TLM line 2 Trouble Rest")
-                sendEvent(name: "systemStatus", value: "System Status\nTLM line 2 Trouble Rest")
-            }
-            else if ( msg.substring(3, 6) == "821")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status Low Battery")
-                sendEvent(name: "systemStatus", value: "System Status\nLow Battery")
-            }
-            else if ( msg.substring(3, 6) == "822")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status Low Battery Rest")
-                sendEvent(name: "systemStatus", value: "System Status\nLow Battery Rest")
-
-            }
-            else if ( msg.substring(3, 6) == "829")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status Sytem Tamper")
-                sendEvent(name: "systemStatus", value: "System Status\nSystem Tamper")
-            }
-            else if ( msg.substring(3, 6) == "830")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status Sytem Tamper Rest")
-                sendEvent(name: "systemStatus", value: "System Status\nSystem Tamper Rest")
-            }
-            else if ( msg.substring(3, 6) == "840")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status Trouble Status (LCD)")
-                sendEvent(name: "systemStatus", value: "System Status\nTrouble Status(LCD)")
-            }
-            else if ( msg.substring(3, 6) == "841")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status Trouble Status (LCD) Rest")
-                sendEvent(name: "systemStatus", value: "System Status\nTrouble Status Rest")
-
-            }
-            else if ( msg.substring(3, 6) == "896")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status Keybus fault")
-                sendEvent(name: "systemStatus", value: "System Status\nKeybus fault")
-            }
-            else if ( msg.substring(3, 6) == "897")  {
-                parent.writeLog("info","DSC AlarmPanel: SY - Alarm System Status Keybus fault Rest")
-                sendEvent(name: "systemStatus", value: "System Status\nKeybus Fault Rest")
-            }
-         
-        // Process alarm update
-        } else if ( msg.substring(0, 2) == "AL" ) {
-            if (msg[3] == "1") {
-                parent.writeLog("info","DSC AlarmPanel: AL - Alarm System AL")
-                sendEvent(name: "alarmStatus", value: "alarm")
-            }
-        // Process chime update
-        } else if ( msg.substring(0, 2) == "CH" ) {
-            if (msg[3] == "1") {
-                parent.writeLog("info","DSC AlarmPanel: CH - Alarm Chime On")
-                sendEvent(name: "chime", value: "chimeOn")
-            } else {
-                parent.writeLog("info","DSC AlarmPanel: CH - Alarm Chime Off")
-                sendEvent(name: "chime", value: "chimeOff")
-            }    
-        // Process zone update
-        } else if ( msg.substring(0, 2) == "ZN" ) {
-            parent.writeLog("info","DSC AlarmPanel: ZN - Alarm Changing Zone Status Type to Open or Close ${msg.substring(3, 9)}")            
-            if ( msg.substring(3, 9) == "609001" ){
-                stateToDisplay = "zone1open"
-                sendEvent(name: "zone1", value: stateToDisplay)
-            }
-            else if ( msg.substring(3, 9) == "610001" ){
-                stateToDisplay = "zone1closed"
-                sendEvent(name: "zone1", value: stateToDisplay)
-            }
-            else if ( msg.substring(3, 9) == "609002" ){
-                stateToDisplay = "zone2open"
-                sendEvent(name: "zone2", value: stateToDisplay)
-            }
-            else if ( msg.substring(3, 9) == "610002" ){
-                stateToDisplay = "zone2closed"
-                sendEvent(name: "zone2", value: stateToDisplay)
-            }
-            else if ( msg.substring(3, 9) == "609003" ){
-                stateToDisplay = "zone3open"
-                sendEvent(name: "zone3", value: stateToDisplay)
-            }
-            else if ( msg.substring(3, 9) == "610003" ){
-                stateToDisplay = "zone3closed"
-                sendEvent(name: "zone3", value: stateToDisplay)
-            }
-            else if ( msg.substring(3, 9) == "609004" ){
-                stateToDisplay = "zone4open"
-                sendEvent(name: "zone4", value: stateToDisplay)
-            }
-            else if ( msg.substring(3, 9) == "610004" ){
-                stateToDisplay = "zone4closed"
-                sendEvent(name: "zone4", value: stateToDisplay)
-            }
-            else if ( msg.substring(3, 9) == "609005" ){
-                stateToDisplay = "zone5open"
-                sendEvent(name: "zone5", value: stateToDisplay)
-            }
-            else if ( msg.substring(3, 9) == "610005" ){
-                stateToDisplay = "zone5closed"
-                sendEvent(name: "zone5", value: stateToDisplay)
-            }
-            else if ( msg.substring(3, 9) == "609006" ){
-                stateToDisplay = "zone6open"
-                sendEvent(name: "zone6", value: stateToDisplay)
-            }
-            else if ( msg.substring(3, 9) == "610006" ){
-                stateToDisplay = "zone6closed"
-                sendEvent(name: "zone6", value: stateToDisplay)
-            }     
-            else {
-                parent.writeLog("debug","DSC AlarmPanel: - Unhandled zone: ${msg}")
-            }
-        }
-    }
+def installed(){
+  addChildDevices()
+  webSocketConnect()
 }
 
-// Implement "switch" (turn alarm on/off)
+def updated(){
+  addChildDevices()
+  webSocketConnect()
+}
+
+def uninstalled(){
+  removeChildDevices()
+}
+
+private addChildDevices() {
+  def zoneSettings = parent.getZonesSettings()
+
+  zoneSettings.each {
+    def deviceId = it.networkId
+    def deviceType = it.type == "contact" ? "Generic Component Contact Sensor" : it.type == "motion" ? "Generic Component Motion Sensor" : "Generic Component Smoke Detector"
+    if (!getChildDevice(deviceId)) {
+      def d = addChildDevice("hubitat", deviceType, deviceId, ["name": it.name, label: it.name, isComponent: true])
+      log.info("Hubitat Alarm - Added zone device: DisplayName: ${d.displayName} - deviceId: ${deviceId}")
+    }
+  }
+  getChildDevices().each{
+    def findalldev = !zoneSettings.findAll{z -> z.networkId == it.deviceNetworkId}
+    if(findalldev){
+      log.info("Hubitat Alarm - Orphan Child Device detected. Deleting DisplayName: ${it.displayName} - deviceId: ${it.deviceNetworkId}")
+      deleteChildDevice(it.deviceNetworkId)
+    }
+  }
+}
+
+private removeChildDevices() {
+    getChildDevices().each { deleteChildDevice(it.deviceNetworkId) }
+    log.info("Hubitat Alarm Panel - Removing all Zones child devices")
+}
+
+def alarmPanelparse(evt) {
+  log.debug("Hubitat Alarm Panel - alarmPanelparse Processing command: $evt")
+  sendEvent(name: "systemStatus", value: evt.description)
+
+  // handle DSC Arm/Disarm modes
+  if(evt.hsmstate){
+    parent.updateAlarmHSM(evt.hsmstate)
+    sendEvent(name: "alarmStatus", value: evt.hsmstate)
+  }
+
+  if(evt.code == "901"){
+    sendEvent(name: "chime", value: evt.state)
+  }
+  log.warn("evt.description ${evt.description}")
+  if(evt.description.contains("CHIME")){
+    sendEvent(name: "chime", value: 'ON')
+  }
+  else{
+    sendEvent(name: "chime", value: 'OFF')
+  }
+}
+
+def alarmZoneparse(evt) {
+  log.debug("Hubitat Alarm Panel - alarmZoneparse Processing command: $evt")
+  def zoneChildDevice = getChildDevice("${evt.type}-${evt.zone}")
+  if(evt.state == "open"){
+    log.warn("Zone child device evt.state ${evt.state}")
+    if(zoneChildDevice.supportedAttributes[0].toString() == "contact"){
+      zoneChildDevice.sendEvent(name: "contact", value: "open")
+    }
+    if(zoneChildDevice.supportedAttributes[0].toString() == "motion"){
+      zoneChildDevice.sendEvent(name: "motion", value: "active")
+    }
+    if(zoneChildDevice.supportedAttributes[0].toString() == "smoke"){
+      zoneChildDevice.sendEvent(name: "smoke", value: "detected")
+    }
+  }
+  else if(evt.state == "closed"){
+    if(zoneChildDevice.supportedAttributes[0].toString() == "contact"){
+      zoneChildDevice.sendEvent(name: "contact", value: "closed")
+    }
+    if(zoneChildDevice.supportedAttributes[0].toString() == "motion"){
+      zoneChildDevice.sendEvent(name: "motion", value: "inactive")
+    }
+    if(zoneChildDevice.supportedAttributes[0].toString() == "smoke"){
+      zoneChildDevice.sendEvent(name: "smoke", value: "clear")
+    }
+  }
+}
+
 def off() {
-    parent.writeLog("info","DSC AlarmPanel issued command: Off")
-    //parent.updateAlarmSystemStatus("disarmed")
-    sendRaspberryCommand("alarmDisarm")
+  log.info("Hubitat Alarm Panel - issued command: Off")
+  sendAlarmCommand("alarmDisarm")
 }
 
 def on() {
-    parent.writeLog("info","DSC AlarmPanel issued command: On")
-    sendRaspberryCommand("alarmArmAway")
+  log.info("Hubitat Alarm Panel - issued command: On")
+  sendAlarmCommand("alarmArmAway")
 }
 
-
-// Commands sent to the device
 def armAway() {
-    parent.writeLog("info","DSC AlarmPanel: Sending armAway")
-    sendRaspberryCommand("alarmArmAway")
+  log.info("Hubitat Alarm Panel - Sending armAway")
+  sendAlarmCommand("alarmArmAway")
 }
 
 def armNight() {
-    parent.writeLog("info","DSC AlarmPanel: Sending armNight")
-    sendRaspberryCommand("alarmArmNight")
+  log.info("Hubitat Alarm Panel - Sending armNight")
+  sendAlarmCommand("alarmArmNight")
 }
 
 def armHome() {
-    parent.writeLog("info","DSC AlarmPanel: Sending armHome")
-    sendRaspberryCommand("alarmArmStay")
+  log.info("Hubitat Alarm Panel - Sending armHome")
+  sendAlarmCommand("alarmArmStay")
 }
 
 def disarm() {
-    parent.writeLog("info","DSC AlarmPanel: Sending disarm")    
-    sendRaspberryCommand("alarmDisarm")
-    //parent.updateAlarmSystemStatus("disarmed")
+  log.info("Hubitat Alarm Panel - Sending disarm")
+  sendAlarmCommand("alarmDisarm")
 }
 
 def chimeToggle() {
-    parent.writeLog("info","DSC AlarmPanel: Sending Toggling chime")    
-    sendRaspberryCommand("alarmChimeToggle")
+  log.info("Hubitat Alarm Panel - Sending Toggling chime")
+  sendAlarmCommand("alarmChimeToggle")
 }
 
 def siren() {
-    parent.writeLog("info","DSC AlarmPanel: Sending alarmPanic")    
-    sendRaspberryCommand("alarmPanic")
+  log.info("Hubitat Alarm Panel - Sending alarmPanic")
+  sendAlarmCommand("alarmPanic")
 }
 
 def strobe() {
-    parent.writeLog("info","DSC AlarmPanel: Sending alarmFire")    
-    sendRaspberryCommand("alarmFire")
+  log.info("Hubitat Alarm Panel - Sending alarmFire")
+  sendAlarmCommand("alarmFire")
 }
 
 def alarmSetDate() {
-    parent.writeLog("info","DSC AlarmPanel: Sending alarmSetDate")    
-    sendRaspberryCommand("alarmsetdate")
+  log.info("Hubitat Alarm Panel - Sending alarmSetDate")
+  sendAlarmCommand("alarmsetdate")
 }
 
-// TODO: Need to send off, on, off with a few secs in between to stop and clear the alarm
 def refresh() {
-    parent.writeLog("info","DSC AlarmPanel: Sending alarmUpdate")    
-    sendRaspberryCommand("alarmUpdate")
+  log.info("Hubitat Alarm Panel - Sending alarmUpdate")
+  sendAlarmCommand("alarmUpdate")
 }
 
+def sendAlarmCommand(command) {
+  if(parent.getSettings().communicationType == "API"){
+    def path = "/api/$command"
+    sendAsynchttpGet(path,'sendAlarmCommandcallback')
+  }
+  else if(parent.getSettings().communicationType == "WSS"){
+    interfaces.webSocket.sendMessage('{"command":"' + command + '"}')
+  }
+}
 
+def sendAlarmCommandcallback(response, data){
+  try{
+    log.info("Hubitat Alarm Panel - sendAlarmCommandcallback http response code: ${response.status} http response data ${response.errorData}")
+  }
+  catch(e){
+    log.info("Hubitat Alarm Panel - sendAlarmCommandcallback http response code: ${response.status}")
+  }
+}
 
-def sendRaspberryCommand(String command) {
-	def path = "/api/$command"
-    parent.sendCommand(path);
+def sendAsynchttpGet(path,callback) {
+  def parentSettings = parent.getSettings()
+  def getParams = [
+    uri: "http://$parentSettings.proxyAddress:$parentSettings.proxyPort/$path"
+  ]
+  asynchttpGet(callback, getParams)
+}
+
+def webSocketConnect(){
+  if(parent.getSettings().communicationType == "WSS"){
+    def parentSettings = parent.getSettings()
+    try {
+      interfaces.webSocket.connect("ws://$parentSettings.proxyAddress:$parentSettings.proxyPort/wss", pingInterval: -1)
+    }
+    catch(e) {
+      log.error "Hubitat Alarm Panel - WebSocket connect failed error: ${e.message}"
+    }
+  }
+  else if(parent.getSettings().communicationType == "API"){
+    interfaces.webSocket.close()
+  }
+}
+
+def webSocketStatus(String status){
+    log.debug "Hubitat Alarm Panel - WebSocket webSocketStatus ${status}"
+
+    if(status.contains("failure:")) {
+      log.warn("Hubitat Alarm Panel - WebSocket failure message from web socket ${status}")
+      reconnectWebSocket()
+    }
+    else if(status == 'status: open') {
+      log.info "Hubitat Alarm Panel - WebSocket is open"
+    }
+    else if (status == "status: closing"){
+      log.warn "Hubitat Alarm Panel - WebSocket connection closing."
+      reconnectWebSocket()
+    }
+    else {
+      log.warn "Hubitat Alarm Panel - WebSocket error, reconnecting."
+      reconnectWebSocket()
+    }
+}
+
+def reconnectWebSocket() {
+    log.info("Hubitat Alarm Panel - WebSocket reconnecting in 10 seconds")
+    runIn(10, webSocketConnect)
 }
 
 // This method must exist
 // it's used by hubitat to process the device message
-def parse(description) {
-    parent.writeLog("debug","DSC AlarmPanel: Receive Lan Command ${description}")
-	parent.lanResponseHandler(description)
+def parse(evt) {
+  if(parent.getSettings().communicationType == "API"){
+    try{
+      def map = parseLanMessage(evt)
+      def headers = map.headers;
+      def body = map.data;
+
+      if (headers.'device' != 'alarm') {
+        log.debug("Hubitat Alarm - Received event ${evt} but it didn't came from Alarm")
+        return
+      }
+
+      log.debug("Hubitat Alarm Panel: Received Command ${body}")
+      if(body.type == "partition"){
+        // process Alarm panel partition event
+        alarmPanelparse(body)
+      }
+      else if(body.type == "zone"){
+        // process Alarm zone event
+        alarmZoneparse(body)
+      }
+    }
+    catch(MissingMethodException){
+      // these are events with description: null and data: null, so we'll just pass.
+      pass
+    }
+  }
+  else if(parent.getSettings().communicationType == "WSS"){
+    // process WSS message
+    try{
+      def wssevt = new groovy.json.JsonSlurper().parseText(evt)
+      log.warn("Hubitat Alarm Panel - WSS received command ${wssevt}")
+      if(wssevt.type == "partition"){
+        alarmPanelparse(wssevt)
+      }
+      else if(wssevt.type == "zone"){
+        alarmZoneparse(wssevt)
+      }
+    }
+    catch(e){
+      log.debug("Hubitat Alarm Failed to parse json wssevt = ${e}")
+      return
+    }
+  }
 }

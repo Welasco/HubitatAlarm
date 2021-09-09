@@ -148,7 +148,8 @@ var return_json = {
     'zone': '',
     'state': '',
     'type': '',
-    'partition': ''
+    'partition': '',
+    'hsmstate': ''
 }
 
 function updateZone(partitionNumber, zoneNumber, state) {
@@ -161,6 +162,7 @@ function updateZone(partitionNumber, zoneNumber, state) {
     return_json.name = 'Zone Update';
     return_json.description = 'Event used for Zone update open/closed';
     return_json.partition = '';
+    return_json.hsmstate = '';
     log.info('[Honeywell-EventParser] Zone Event: '+JSON.stringify(return_json));
     return return_json;
 }
@@ -176,6 +178,7 @@ function updatePartition(partitionNumber, state, alpha) {
     return_json.name = 'Panel Update';
     return_json.description = alpha;
     return_json.code = '';
+    return_json.hsmstate = state == 'armedstay' ? 'armHome' : state == 'armedaway' ? 'armAway' : state == 'armedinstant' ? 'armHome' : state == 'armedmax' ? 'armHome' : state == 'ready' ? 'disarmAll' : '';
     log.info('[Honeywell-EventParser] Panel Event: '+JSON.stringify(return_json));
     return return_json;
 }

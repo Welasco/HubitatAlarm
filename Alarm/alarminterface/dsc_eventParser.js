@@ -76,7 +76,7 @@ var command_map = {
         'name': 'Acknowledgement of ArmStay command',
         'description': 'This code is the acknowledgement of the ArmStay command.',
         'code': '50003129',
-        'hsmstate':'armedHome',
+        'hsmstate':'armHome',
         'type': 'partition',
         'handler': parseAcknowledgementArm
     },
@@ -84,7 +84,7 @@ var command_map = {
         'name': 'Acknowledgement of ArmNight command',
         'description': 'This code is the acknowledgement of the ArmNight command.',
         'code': '5000332B',
-        'hsmstate':'armedNight',
+        'hsmstate':'armNight',
         'type': 'partition',
         'handler': parseAcknowledgementArm
     },
@@ -92,19 +92,19 @@ var command_map = {
         'name': 'Acknowledgement of ArmAway command',
         'description': 'This code is the acknowledgement of the ArmAway command.',
         'code': '50003028',
-        'hsmstate':'armedAway',
+        'hsmstate':'armAway',
         'type': 'partition',
         'handler': parseAcknowledgementArm
     },
     // Commented it's redundant to 655 command.
-    // '50004029': {
-    //     'name': 'Acknowledgement of Disarm command',
-    //     'description': 'This code is the acknowledgement of the Disarm command.',
-    //     'code': '50004029',
-    //     'hsmstate':'disarmed',
-    //     'type': 'partition',
-    //     'handler': parseAcknowledgementArm
-    // },
+    '50004029': {
+        'name': 'Acknowledgement of Disarm command',
+        'description': 'This code is the acknowledgement of the Disarm command.',
+        'code': '50004029',
+        'hsmstate':'disarmAll',
+        'type': 'partition',
+        'handler': parseAcknowledgementArm
+    },
     '501': {
         'name': 'Invalid command',
         'description': 'Command has been received with a bad checksum.',

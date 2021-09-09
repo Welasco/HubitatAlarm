@@ -12,7 +12,7 @@
       "port": "3001",
       "password": "user"
     },
-    "alarmType": "DSC",
+    "alarmType": "Honeywell",
     "connectionType": "Envisalink",
     "communicationType": "WSS",
     "panelConfig": {
@@ -22,19 +22,19 @@
           "zone": "001",
           "type": "contact",
           "networkId": "zone-001",
-          "name": "ZoneOffice"
+          "name": "KitchenZone001"
         },
         {
           "zone": "002",
-          "type": "contact",
+          "type": "motion",
           "networkId": "zone-002",
-          "name": "ZoneKitchen"
+          "name": "OfficeZone002"
         },
         {
           "zone": "003",
-          "type": "contact",
+          "type": "smoke",
           "networkId": "zone-003",
-          "name": "ZoneMaster"
+          "name": "OfficeZone003"
         }
       ]
     }

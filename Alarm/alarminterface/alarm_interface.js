@@ -14,7 +14,7 @@ class alarm_interface extends EventEmitter {
         this.init();
     }
     init(){
-        switch (alarmType) {
+        switch (nconf.get('alarm:alarmType')) {
             case 'DSC':
                 this.#dsc();
                 break;
