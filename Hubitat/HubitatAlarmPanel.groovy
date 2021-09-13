@@ -1,5 +1,6 @@
 metadata {
   definition (name: "Hubitat Alarm Panel", namespace: "hubitatalarm", author: "victor@hepoca.com") {
+    capability "Initialize"
     capability "Alarm"
     capability "Switch"
     capability "Refresh"
@@ -14,6 +15,7 @@ metadata {
     command "disarm"
     command "chimeToggle"
     command "alarmSetDate"
+
   }
 }
 
@@ -27,12 +29,16 @@ def updated(){
   webSocketConnect()
 }
 
+def initialize() {
+  webSocketConnect()
+}
+
 def uninstalled(){
   removeChildDevices()
 }
 
 private addChildDevices() {
-  def zoneSettings = parent.getZonesSettings()
+  def zoneSettings = parent.getZonesSettingsChild()
 
   zoneSettings.each {
     def deviceId = it.networkId

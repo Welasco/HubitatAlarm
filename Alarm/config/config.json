@@ -2,7 +2,7 @@
   "httpport": 3000,
   "alarm": {
     "alarmpassword": "1234",
-    "SHM": true,
+    "SHM": false,
     "dsc_it100": {
       "linuxSerialUSBtty": "",
       "baudRate": 9600
@@ -13,7 +13,7 @@
       "password": "user"
     },
     "alarmType": "Honeywell",
-    "connectionType": "Envisalink",
+    "connectionType": "",
     "communicationType": "WSS",
     "panelConfig": {
       "type": "discover",
@@ -21,20 +21,32 @@
         {
           "zone": "001",
           "type": "contact",
-          "networkId": "zone-001",
-          "name": "KitchenZone001"
+          "networkId": "001",
+          "name": "z1"
         },
         {
           "zone": "002",
           "type": "motion",
-          "networkId": "zone-002",
-          "name": "OfficeZone002"
+          "networkId": "002",
+          "name": "z2"
         },
         {
           "zone": "003",
           "type": "smoke",
-          "networkId": "zone-003",
-          "name": "OfficeZone003"
+          "networkId": "003",
+          "name": "z3"
+        },
+        {
+          "zone": "004",
+          "type": "contact",
+          "networkId": "010",
+          "name": "z10"
+        },
+        {
+          "zone": "005",
+          "type": "contact",
+          "networkId": "005",
+          "name": "z5"
         }
       ]
     }

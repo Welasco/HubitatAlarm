@@ -98,6 +98,7 @@ def mainpage() {
             section{
               (1..zones).each{
                 def inputZoneCode = (it.toString().length() == 1) ? '00'+it.toString() : (it.toString().length() == 2)? '0'+it.toString(): it.toString();
+                input name: "zone-networkid-$inputZoneCode", type: "number", title: "Set Zone Network ID for zone-$inputZoneCode", defaultValue: "$inputZoneCode", submitOnChange: false, width:4, required: true
                 input name: "zone-$inputZoneCode", type: "text", title: "Set Zone Name for zone-$inputZoneCode", submitOnChange: false, width:4, required: true
                 input name: "zonetype-$inputZoneCode", type: "enum", title: "Set Zone Type for zone-$inputZoneCode", options: ["contact","motion","smoke"], defaultValue: "contact", submitOnChange: false, width:4
                 paragraph "<br>"
@@ -127,6 +128,7 @@ def zonesPage(){
         section{
           (1..zones).each{
             def inputZoneCode = (it.toString().length() == 1) ? '00'+it.toString() : (it.toString().length() == 2)? '0'+it.toString(): it.toString();
+            input name: "zone-networkid-$inputZoneCode", type: "number", title: "Set Zone Network ID for zone-$inputZoneCode", defaultValue: "$inputZoneCode", submitOnChange: false, width:4, required: true
             input name: "zone-$inputZoneCode", type: "text", title: "Set Zone Name for zone-$inputZoneCode", submitOnChange: false, width:4, required: true
             input name: "zonetype-$inputZoneCode", type: "enum", title: "Set Zone Type for zone-$inputZoneCode", options: ["contact","motion","smoke"], defaultValue: "contact", submitOnChange: false, width:4
             paragraph "<br>"
@@ -183,9 +185,13 @@ def importAlarmSettingsCallback(response, data){
     app.updateSetting("zones", [type:"number", value: obj.panelConfig.zones.size])
     settings.zones = obj.panelConfig.zones.size
     obj.panelConfig.zones.each{
-      app.updateSetting(it.networkId, [type:"text", value: it.name])
-      settings."$it.networkId" = it.name
+      app.updateSetting("zone-$it.zone", [type:"text", value: it.name])
+      settings."zone-$it.zone" = it.name
+
       app.updateSetting("zonetype-$it.zone", [type:"enum", value: it.type])
+
+      settings."zone-networkid-$it.zone" = it.networkId
+      app.updateSetting("zone-networkid-$it.zone", [type:"text", value: it.networkId])
     }
 }
 
@@ -212,10 +218,28 @@ def getZonesSettings(){
     def zoneindex = (i.toString().length() == 1) ? '00'+i.toString() : (i.toString().length() == 2)? '0'+i.toString(): i.toString();
     def zoneName = settings."zone-$zoneindex"
     def zoneType = settings."zonetype-$zoneindex"
+    def zoneNetworkId = (settings."zone-networkid-$zoneindex".toString().length() == 1) ? '00'+settings."zone-networkid-$zoneindex" : (settings."zone-networkid-$zoneindex".toString().length() == 2)? '0'+settings."zone-networkid-$zoneindex": settings."zone-networkid-$zoneindex";
     configZones << [
       "zone": zoneindex,
       "type": zoneType,
-      "networkId": "zone-$zoneindex",
+      "networkId": zoneNetworkId,
+      "name": zoneName
+    ]
+  }
+  return configZones
+}
+
+def getZonesSettingsChild(){
+  def configZones = []
+  for(int i = 1;i<=settings.zones;i++) {
+    def zoneindex = (i.toString().length() == 1) ? '00'+i.toString() : (i.toString().length() == 2)? '0'+i.toString(): i.toString();
+    def zoneName = settings."zone-$zoneindex"
+    def zoneType = settings."zonetype-$zoneindex"
+    def zoneNetworkId = (settings."zone-networkid-$zoneindex".toString().length() == 1) ? '00'+settings."zone-networkid-$zoneindex" : (settings."zone-networkid-$zoneindex".toString().length() == 2)? '0'+settings."zone-networkid-$zoneindex": settings."zone-networkid-$zoneindex";
+    configZones << [
+      "zone": zoneindex,
+      "type": zoneType,
+      "networkId": "zone-$zoneNetworkId",
       "name": zoneName
     ]
   }
