@@ -23,7 +23,10 @@ install (){
     echo "Installing unzip"
     apt-get update && sudo apt-get install unzip -y > /dev/null 2>&1
     echo "Downloading NodeJSAzureDynamicDNS"
-    wget -Nnv https://github.com/Welasco/NodeJSAzureDynamicDNS/archive/master.zip -O NodeJSAzureDynamicDNS.zip
+    #wget -Nnv https://github.com/Welasco/NodeJSAzureDynamicDNS/archive/master.zip -O NodeJSAzureDynamicDNS.zip
+    #wget -qO - https://github.com/Welasco/HubitatAlarm/archive/master.tar.gz | tar zx --strip-components=1 Alarm/
+    # tar zx -f HubitatAlarm.tar.gz --strip-components=1 HubitatAlarm-master/Alarm
+    wget -qO - https://github.com/Welasco/HubitatAlarm/archive/master.tar.gz | tar zx --strip-components=1 HubitatAlarm-master/Alarm
     unzip NodeJSAzureDynamicDNS.zip -d /opt > /dev/null 2>&1
     mv /opt/NodeJSAzureDynamicDNS-master/ $INSTALL_DIR
     chmod +755 $INSTALL_DIR/UpdateAzureRMDDNS.js
