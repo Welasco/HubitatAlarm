@@ -231,6 +231,7 @@ def webSocketStatus(String status){
 
 def reconnectWebSocket() {
     log.info("Hubitat Alarm Panel - WebSocket reconnecting in 10 seconds")
+    interfaces.webSocket.close()
     runIn(10, webSocketConnect)
 }
 
