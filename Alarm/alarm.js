@@ -157,6 +157,9 @@ app.post('/config', express.json({type: '*/*'}), function (req, res) {
             }
         });
         log.debug('[Alarm] Received a valid config.json. Configuration saved.');
+        res.end();
+        log.debug('[Alarm] Configuration change detected. Force process shutdown in 5 seconds. Linux systemd will restart the service.');
+        setTimeout(function() { process.exit(0); }, 5000);
     }
     else{
         log.error('[Alarm] Invalid Schema');
