@@ -3,14 +3,13 @@ Description=Alarm
 After=network.target
 
 [Service]
-#ExecStart=/home/pi/HubitatAlarm/Alarm/alarm.js
-ExecStart=npm start
+ExecStart=/opt/Alarm/alarm.js
 Restart=always
 User=pi
 Group=pi
 Environment=PATH=/usr/bin:/usr/local/bin
 Environment=NODE_ENV=production
-WorkingDirectory=/home/pi/HubitatAlarm/Alarm
+WorkingDirectory=/opt/Alarm
 
 [Install]
 WantedBy=multi-user.target

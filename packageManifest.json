@@ -1,0 +1,29 @@
+{
+  "packageName": "Hubitat Alarm",
+  "author": "Victor Santana",
+  "version": "1.0.0",
+  "minimumHEVersion": "2.2.4",
+  "dateReleased": "2021-09-14",
+  "communityLink": "https://community.hubitat.com",
+  "releaseNotes": "Please see changelog at https://github.com/Welasco/HubitatAlarm/blob/master/CHANGELOG.md for recent changes.",
+  "apps": [
+    {
+      "id": "36464e93-495e-430c-9eda-c61fafffb59e",
+      "name": "Hubitat Alarm",
+      "namespace": "hubitatalarm",
+      "location": "https://raw.githubusercontent.com/Welasco/HubitatAlarm/master/Hubitat/HubitatAlarmApp.groovy",
+      "required": true,
+      "oauth": false,
+      "primary": false
+    }
+  ],
+  "drivers": [
+    {
+      "id": "30794545-6b97-42ef-8bac-06d6208034be",
+      "name": "Hubitat Alarm Panel",
+      "namespace": "hubitatalarm",
+      "location": "https://raw.githubusercontent.com/Welasco/HubitatAlarm/master/Hubitat/HubitatAlarmPanel.groovy",
+      "required": true
+    }
+  ]
+}
