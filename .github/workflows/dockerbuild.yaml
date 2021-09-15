@@ -44,5 +44,5 @@ jobs:
           context: ./Alarm/
           file: ./Alarm/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/hubitatalarm:latest,${{ secrets.DOCKER_HUB_USERNAME }}/hubitatalarm:v1.0.0
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/hubitatalarm:latest
 
