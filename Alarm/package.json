@@ -15,7 +15,7 @@
   ],
   "license": "MIT",
   "name": "alarm",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Alarm implementation for Hubitat",
   "main": "alarm.js",
   "homepage": "https://github.com/Welasco/HubitatAlarm",
