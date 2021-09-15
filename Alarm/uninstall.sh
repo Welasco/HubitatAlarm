@@ -21,6 +21,7 @@ else
 fi
 
 echo "Reloading daemon"
+sudo systemctl stop alarm
 sudo systemctl daemon-reload
 if [ $? -eq 0 ]; then
     echo "Daemon reloaded"
