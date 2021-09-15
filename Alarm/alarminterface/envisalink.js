@@ -36,7 +36,13 @@ class envisalink extends EventEmitter {
         //     log.info('Client connection timeout. ');
         // });
         this.net_client.on('error', function (err) {
-            log.error('[EnvisaLink] disconnected. Error Name: '+err.name+' Message: '+err.message);
+            if(envisalink_ip == '127.0.0.1'){
+                log.info('[EnvisaLink] Waiting for Hubitat initial setup...');
+                log.silly('[EnvisaLink] Trying to connect to 127.0.0.1. This is the default config IP. You must go to Hubitat to finish the setup and have this ip updated to real Envisalink IP.');
+            }
+            else{
+                log.error('[EnvisaLink] disconnected. Error Name: '+err.name+' Message: '+err.message);
+            }
             self.net_client.destroy();
             // Wait 4 seconds and reconnect
             setTimeout(function() { self.init() }, 4000);
