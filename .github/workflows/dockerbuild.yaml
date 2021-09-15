@@ -8,6 +8,8 @@ on:
       - 'Alarm/**'
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
+
 
 jobs:
   docker_build:
