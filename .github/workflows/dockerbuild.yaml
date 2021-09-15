@@ -32,7 +32,7 @@ jobs:
         id: docker_tags
         uses: greboid/docker-tags-action@v1
         with:
-          repository: welasco
+          repository: "welasco"
 
       - name: Image digest
         run: echo ${{ steps.docker_tags.outputs.tags }}
@@ -44,5 +44,5 @@ jobs:
           context: ./Alarm/
           file: ./Alarm/Dockerfile
           push: true
-          tags: ${{ steps.docker_tags.outputs.tags }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/hubitatalarm:latest,${{ secrets.DOCKER_HUB_USERNAME }}/hubitatalarm:v1.0.0
 
