@@ -30,7 +30,10 @@ jobs:
 
       - name: Generate tags
         id: docker_tags
-        uses: dnaka91/action-docker-tags@v0.1
+        uses: greboid/docker-tags-action@v1
+        with:
+          repository: welasco
+          fullname: false
 
       - name: Image digest
         run: echo ${{ steps.docker_tags.outputs.tags }}
@@ -42,5 +45,5 @@ jobs:
           context: ./Alarm/
           file: ./Alarm/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/hubitatalarm:latest, ${{ steps.docker_tags.outputs.tags }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/hubitatalarm:latest
 
