@@ -12,7 +12,7 @@
       "port": "3001",
       "password": "user"
     },
-    "alarmType": "DSC",
+    "alarmType": "Honeywell",
     "connectionType": "Envisalink",
     "communicationType": "WSS",
     "panelConfig": {
@@ -22,48 +22,18 @@
           "zone": "001",
           "type": "contact",
           "networkId": "zone-001",
-          "name": "Alarm Zone001"
-        },
-        {
-          "zone": "002",
-          "type": "contact",
-          "networkId": "zone-002",
-          "name": "Alarm Zone002"
-        },
-        {
-          "zone": "003",
-          "type": "contact",
-          "networkId": "zone-003",
-          "name": "Alarm Zone003"
-        },
-        {
-          "zone": "004",
-          "type": "contact",
-          "networkId": "zone-004",
-          "name": "Alarm Zone004"
-        },
-        {
-          "zone": "005",
-          "type": "contact",
-          "networkId": "zone-005",
-          "name": "Alarm Zone005"
-        },
-        {
-          "zone": "006",
-          "type": "contact",
-          "networkId": "zone-006",
-          "name": "Alarm Zone006"
+          "name": "KitchenZone001"
         }
       ]
     }
   },
   "notify": {
-    "address": "127.0.0.1",
-    "port": "3002"
+    "address": "",
+    "port": ""
   },
   "log": {
     "loglevel": "debug",
-    "logtofile": true,
+    "logtofile": false,
     "logfilepath": "alarm.log"
   }
 }
