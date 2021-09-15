@@ -1,10 +1,7 @@
 FROM node:16-buster
 
-# Create app directory
 WORKDIR /opt/Alarm
 COPY . .
-
-#COPY startup /opt/startup
 
 RUN apt-get update \
     && apt-get install -y net-tools nano curl wget tcpdump dnsutils
