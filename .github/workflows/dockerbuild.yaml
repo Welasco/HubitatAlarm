@@ -43,5 +43,6 @@ jobs:
         with:
           context: ./Alarm/
           file: ./Alarm/Dockerfile
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.docker_tags.outputs.tags }}
