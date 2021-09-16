@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+
+const init_config = require('./tools/initialize_config');
+init_config.init();
 const express = require('express')
 const app = express()
 const server = require('http').createServer(app);
