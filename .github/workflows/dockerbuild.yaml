@@ -48,11 +48,31 @@ jobs:
           tags: ${{ steps.docker_tags.outputs.tags }}
 
       - name: Build and push linux/arm64
-        id: docker_build_arm
+        id: docker_build_arm64
         uses: docker/build-push-action@v2
         with:
           context: ./Alarm/
           file: ./Alarm/Dockerfile
           platforms: linux/arm64
+          push: true
+          tags: ${{ steps.docker_tags.outputs.tags }}
+
+      - name: Build and push linux/arm/v7
+        id: docker_build_armv7
+        uses: docker/build-push-action@v2
+        with:
+          context: ./Alarm/
+          file: ./Alarm/Dockerfile
+          platforms: linux/arm/v7
+          push: true
+          tags: ${{ steps.docker_tags.outputs.tags }}
+
+      - name: Build and push linux/arm/v6
+        id: docker_build_armv6
+        uses: docker/build-push-action@v2
+        with:
+          context: ./Alarm/
+          file: ./Alarm/Dockerfile
+          platforms: linux/arm/v6
           push: true
           tags: ${{ steps.docker_tags.outputs.tags }}
