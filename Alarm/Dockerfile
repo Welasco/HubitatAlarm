@@ -3,8 +3,8 @@ FROM node:16-buster
 WORKDIR /opt/Alarm
 COPY . .
 
-RUN apt-get update \
-    && apt-get install -y nano curl wget tcpdump
+RUN apt update \
+    && apt install -y nano curl wget tcpdump
 
 RUN npm install -g pm2 \
     && echo "cd /opt/Alarm" >> /etc/bash.bashrc \
