@@ -4,7 +4,7 @@ WORKDIR /opt/Alarm
 COPY . .
 
 RUN apt-get update \
-    && apt-get install -y net-tools nano curl wget tcpdump
+    && apt-get install -y nano curl wget tcpdump
 
 RUN npm install -g pm2 \
     && echo "cd /opt/Alarm" >> /etc/bash.bashrc \
