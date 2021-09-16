@@ -2,8 +2,8 @@ name: Docker Build Hubitat Alarm
 
 on:
   push:
-    branches:
-      - 'master'
+    # branches:
+    #   - 'master'
     # paths:
     #   - 'Alarm/**'
     tags:
