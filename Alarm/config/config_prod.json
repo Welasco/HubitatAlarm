@@ -1,0 +1,39 @@
+{
+  "httpport": 3000,
+  "alarm": {
+    "alarmpassword": "1234",
+    "SHM": true,
+    "dsc_it100": {
+      "linuxSerialUSBtty": "/dev/ttyUSB0",
+      "baudRate": 9600
+    },
+    "envisalink": {
+      "ip": "127.0.0.1",
+      "port": "3001",
+      "password": "user"
+    },
+    "alarmType": "Honeywell",
+    "connectionType": "Envisalink",
+    "communicationType": "WSS",
+    "panelConfig": {
+      "type": "discover",
+      "zones": [
+        {
+          "zone": "001",
+          "type": "contact",
+          "networkId": "zone-001",
+          "name": "KitchenZone001"
+        }
+      ]
+    }
+  },
+  "notify": {
+    "address": "",
+    "port": ""
+  },
+  "log": {
+    "loglevel": "debug",
+    "logtofile": false,
+    "logfilepath": "alarm.log"
+  }
+}
