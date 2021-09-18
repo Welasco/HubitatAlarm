@@ -338,6 +338,7 @@ def initialize() {
   subscribe(location, "hsmStatus", alarmHandler)
   subscribe(location, "hsmRules", alarmHandlerhsmRules)
   subscribe (location, "hsmAlerts", alarmHandlerhsmAlerts)
+  atomicState.commandfromAlarm == false
   log.info("Hubitat Alarm Panel - Initialized")
 }
 
