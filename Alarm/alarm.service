@@ -5,8 +5,8 @@ After=network.target
 [Service]
 ExecStart=/opt/Alarm/alarm.js
 Restart=always
-User=pi
-Group=pi
+User=root
+Group=root
 Environment=PATH=/usr/bin:/usr/local/bin
 Environment=NODE_ENV=production
 WorkingDirectory=/opt/Alarm
