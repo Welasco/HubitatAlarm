@@ -213,7 +213,7 @@ def webSocketConnect(){
   if(parent.getSettings().communicationType == "WSS"){
     def parentSettings = parent.getSettings()
     try {
-      interfaces.webSocket.connect("ws://$parentSettings.proxyAddress:$parentSettings.proxyPort/wss", pingInterval: -1)
+      interfaces.webSocket.connect("ws://$parentSettings.proxyAddress:$parentSettings.proxyPort/wss", pingInterval: 60)
     }
     catch(e) {
       log.error "Hubitat Alarm Panel - WebSocket connect failed error: ${e.message}"
