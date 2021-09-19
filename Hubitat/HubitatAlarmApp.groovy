@@ -317,8 +317,8 @@ def installed() {
     hubSubscribeCallbackSettings()
   }
   else{
-    updateAlarmSettings()
     hubSubscribeCallbackSettings()
+    updateAlarmSettings()
   }
   log.info("Hubitat Alarm - Installed with settings: ${settings}")
   addHubitatAlarmPanel()
@@ -327,11 +327,11 @@ def installed() {
 
 def updated() {
   log.info("Hubitat Alarm - Updated")
-  updateAlarmSettings()
   hubSubscribeCallbackSettings()
+  updateAlarmSettings()
   updateHubitatAlarmPanel()
   getChildDevice(GetDSCAlarmID()).updated()
-
+  initialize()
 }
 
 def initialize() {
@@ -339,7 +339,7 @@ def initialize() {
   subscribe(location, "hsmRules", alarmHandlerhsmRules)
   subscribe (location, "hsmAlerts", alarmHandlerhsmAlerts)
   atomicState.commandfromAlarm == false
-  log.info("Hubitat Alarm Panel - Initialized")
+  log.info("Hubitat Alarm App - Initialized")
 }
 
 def uninstalled() {
@@ -390,9 +390,9 @@ def alarmHandler(evt) {
     return
   }
   log.debug("Hubitat Alarm - alarmHandler state commandfromAlarm: ${atomicState.commandfromAlarm}")
+  def panelChildDevice = getChildDevice(GetDSCAlarmID())
   if(atomicState.commandfromAlarm == false){
     log.debug("Hubitat Alarm - alarmHandler HSM current status per Hubitat Alarm - ${atomicState.alarmSystemStatus}")
-    def panelChildDevice = getChildDevice(GetDSCAlarmID())
     if (evt.value == "armedHome") {
       panelChildDevice.armHome()
       panelChildDevice.sendEvent(name: "switch", value: "on")
@@ -437,16 +437,45 @@ def alarmHandlerhsmAlerts(evt){
 }
 
 private updateAlarmHSM(partitionstatus) {
-  // don't forget to handle on/off switch event for the panel
   if (!settings.enableSHM) {
     return
   }
+  log.debug("Hubitat Alarm - updateAlarmSystemStatus Location.hsmStatus: ${location.hsmStatus}")
+  log.debug("Hubitat Alarm - updateAlarmSystemStatus getlocation().hsmStatus: ${getLocation().hsmStatus}")
   def lastAlarmSystemStatus = atomicState.alarmSystemStatus
-  atomicState.alarmSystemStatus = partitionstatus
+  if (partitionstatus == "armedHome") {
+    atomicState.alarmSystemStatus = "armedHome"
+  }
+  if (partitionstatus == "armedNight") {
+    atomicState.alarmSystemStatus = "armedNight"
+  }
+  if (partitionstatus == "armedAway") {
+    atomicState.alarmSystemStatus = "armedAway"
+  }
+  if (partitionstatus == "disarmed") {
+    atomicState.alarmSystemStatus = "disarmed"
+  }
+  if (partitionstatus == "allDisarmed") {
+    atomicState.alarmSystemStatus = "allDisarmed"
+  }
   if (lastAlarmSystemStatus != atomicState.alarmSystemStatus) {
     atomicState.commandfromAlarm = true
-    sendLocationEvent(name: "hsmSetArm", value: partitionstatus)
-    log.debug("Hubitat Alarm - updateAlarmSystemStatus change state commandfromAlarm to: ${atomicState.commandfromAlarm}")
+    if(atomicState.alarmSystemStatus == "armedAway"){
+      sendLocationEvent(name: "hsmSetArm", value: "armAway")
+    }
+    if(atomicState.alarmSystemStatus == "armedNight"){
+      sendLocationEvent(name: "hsmSetArm", value: "armNight")
+    }
+    if(atomicState.alarmSystemStatus == "armedHome"){
+      sendLocationEvent(name: "hsmSetArm", value: "armHome")
+    }
+    if(atomicState.alarmSystemStatus == "disarmed"){
+      sendLocationEvent(name: "hsmSetArm", value: "disarm")
+    }
+    if(atomicState.alarmSystemStatus == "allDisarmed"){
+      sendLocationEvent(name: "hsmSetArm", value: "disarmAll")
+    }
+    log.debug("Hubitat Alarm - updateAlarmSystemStatus change state commandfromAlarm to: ${atomicState.commandfromAlarm} partitionstatus: ${partitionstatus}")
   }
   log.debug("Hubitat Alarm - updateAlarmSystemStatus lastAlarmSystemStatus: ${lastAlarmSystemStatus} atomicState.alarmSystemStatus: ${atomicState.alarmSystemStatus} atomicState.commandfromAlarm: ${atomicState.commandfromAlarm}")
 }

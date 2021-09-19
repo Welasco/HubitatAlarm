@@ -76,7 +76,7 @@ var command_map = {
         'name': 'Acknowledgement of ArmStay command',
         'description': 'This code is the acknowledgement of the ArmStay command.',
         'code': '50003129',
-        'hsmstate':'armHome',
+        'hsmstate':'armedHome',
         'type': 'partition',
         'handler': parseAcknowledgementArm
     },
@@ -84,7 +84,7 @@ var command_map = {
         'name': 'Acknowledgement of ArmNight command',
         'description': 'This code is the acknowledgement of the ArmNight command.',
         'code': '5000332B',
-        'hsmstate':'armNight',
+        'hsmstate':'armedNight',
         'type': 'partition',
         'handler': parseAcknowledgementArm
     },
@@ -92,7 +92,7 @@ var command_map = {
         'name': 'Acknowledgement of ArmAway command',
         'description': 'This code is the acknowledgement of the ArmAway command.',
         'code': '50003028',
-        'hsmstate':'armAway',
+        'hsmstate':'armedAway',
         'type': 'partition',
         'handler': parseAcknowledgementArm
     },
@@ -101,7 +101,7 @@ var command_map = {
         'name': 'Acknowledgement of Disarm command',
         'description': 'This code is the acknowledgement of the Disarm command.',
         'code': '50004029',
-        'hsmstate':'disarmAll',
+        'hsmstate':'disarmed',
         'type': 'partition',
         'handler': parseAcknowledgementArm
     },
@@ -170,6 +170,7 @@ var command_map = {
         'name': 'Partition Armed',
         'description': 'Partition is Armed.',
         'code': '652',
+        'hsmstate':'armedAway',
         'type': 'partition',
         'handler': parseGenericReceivedData
     },
