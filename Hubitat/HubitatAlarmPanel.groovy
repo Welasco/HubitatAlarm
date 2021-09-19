@@ -66,8 +66,23 @@ def alarmPanelparse(evt) {
   log.debug("Hubitat Alarm Panel - alarmPanelparse Processing command: $evt")
   sendEvent(name: "systemStatus", value: evt.description)
 
+  if(location.hsmStatus == "armedAway" || location.hsmStatus == "armedHome" || location.hsmStatus == "armedNight"){
+    sendEvent(name: "switch", value: "on")
+  }
+  else{
+    sendEvent(name: "switch", value: "off")
+  }
+
   // handle DSC Arm/Disarm modes
   if(evt.hsmstate){
+    log.info("Hubitat Alarm Panel - alarmPanelparse Checking if event is 652 evt.code: ${evt.code}")
+    if(evt.code == "652"){
+      log.info("Hubitat Alarm Panel - alarmPanelparse Checking location.hsmStatus: ${location.hsmStatus}")
+      if(location.hsmStatus == "armedAway" || location.hsmStatus == "armedHome" || location.hsmStatus == "armedNight"){
+        log.info("Hubitat Alarm Panel - alarmPanelparse Alarm already armed. returning.")
+        return
+      }
+    }
     parent.updateAlarmHSM(evt.hsmstate)
     sendEvent(name: "alarmStatus", value: evt.hsmstate)
   }

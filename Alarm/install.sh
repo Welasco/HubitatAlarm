@@ -111,9 +111,9 @@ installhubitatalarm (){
     cd /opt
     wget -qO - https://github.com/Welasco/HubitatAlarm/archive/master.tar.gz | tar zx --strip-components=1 HubitatAlarm-master/Alarm
     if [ $? -eq 0 ]; then
-        echo "Hubitat Alarm update success"
+        echo "Hubitat Alarm extrating success"
     else
-        echo "Hubitat Alarm failt to update. Exiting instalation. Error Code:" $?
+        echo "Hubitat Alarm fail to update. Exiting instalation. Error Code:" $?
         exit 1
     fi
 }
