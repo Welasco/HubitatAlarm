@@ -24,6 +24,7 @@ install (){
     installnpm
 
     restore
+
     setupsystemd
 
     echo "Update success"
@@ -138,6 +139,7 @@ setupsystemd (){
     fi
 
     echo "Starting alarm service"
+    sudo systemctl stop alarm
     sudo systemctl start alarm
     if [ $? -eq 0 ]; then
         echo "Service alarm.service started"
