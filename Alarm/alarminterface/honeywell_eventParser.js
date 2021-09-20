@@ -178,7 +178,7 @@ function updatePartition(partitionNumber, state, alpha) {
     return_json.name = 'Panel Update';
     return_json.description = alpha;
     return_json.code = '';
-    return_json.hsmstate = state == 'armedstay' ? 'armHome' : state == 'armedaway' ? 'armAway' : state == 'armedinstant' ? 'armHome' : state == 'armedmax' ? 'armHome' : state == 'ready' ? 'disarmAll' : '';
+    return_json.hsmstate = state == 'armedstay' ? 'armedHome' : state == 'armedaway' ? 'armedAway' : state == 'armedinstant' ? 'armedHome' : state == 'armedmax' ? 'armedHome' : state == 'ready' ? 'disarmAll' : '';
     log.info('[Honeywell-EventParser] Panel Event: '+JSON.stringify(return_json));
     return return_json;
 }
