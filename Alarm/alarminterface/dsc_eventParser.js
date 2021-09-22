@@ -185,6 +185,7 @@ var command_map = {
         'name': 'Partition disarmed',
         'description': 'Partition is disarmed.',
         'code': '655',
+        'hsmstate':'disarmed',
         'type': 'partition',
         'handler': parseGenericReceivedData
     },
