@@ -174,7 +174,7 @@ def strobe() {
 
 def alarmSetDate() {
   log.info("Hubitat Alarm Panel - Sending alarmSetDate")
-  sendAlarmCommand("alarmsetdate")
+  sendAlarmCommand("alarmSetDate")
 }
 
 def refresh() {
