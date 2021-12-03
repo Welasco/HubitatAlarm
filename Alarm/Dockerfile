@@ -1,10 +1,10 @@
-FROM node:16-buster
+FROM node:fermium-alpine
 
 WORKDIR /opt/Alarm
 COPY . .
 
-RUN apt update \
-    && apt install -y nano curl wget tcpdump dnsutils
+RUN apk update \
+    && apk add curl wget tcpdump make gcc g++ linux-headers udev python2 python3
 
 RUN npm install -g pm2 \
     && echo "cd /opt/Alarm" >> /etc/bash.bashrc \
