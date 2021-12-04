@@ -25,17 +25,17 @@ Hubitat Alarm is all in one solution with the following features:
 
 ### **DSC with IT-100**
 
-IT-100 is a serial board (RS-232) that can be integrated with DSC Alarm system. It implement an interface to interact with DSC main Alarm board by sending/receiving commands. [Detailed information.](./Documentation/DSC-it100.pdf)
+IT-100 is a serial board (RS-232) that can be integrated with DSC Alarm system. It implement an interface to interact with DSC main Alarm board by sending/receiving commands. [More information.](./Documentation/DSC-it100.pdf)
 
 ### **DSC with Envisalink**
 
-- Envisalink is a Ethernet board that can be integrated with DSC Alarm system. It implement an interface to interact with DSC main Alarm board by sending/receiving commands. [Detailed information.](./Documentation/EnvisaLinkTPI-ADEMCO-1-03.pdf)
+- Envisalink is a Ethernet board that can be integrated with DSC Alarm system. It implement an interface to interact with DSC main Alarm board by sending/receiving commands. [More information.](./Documentation/EnvisaLinkTPI-ADEMCO-1-03.pdf)
 
 ## Honeywell Alarm
 
 ### **Honeywell with Envisalink**
 
-- Envisalink is a Ethernet board that can be integrated with Honeywell alarm. It implement an interface to interact with Honeywell main Alarm board by sending/receiving commands. [Detailed information.](./Documentation/EnvisaLinkTPI-ADEMCO-1-03.pdf)
+- Envisalink is a Ethernet board that can be integrated with Honeywell alarm. It implement an interface to interact with Honeywell main Alarm board by sending/receiving commands. [More information.](./Documentation/EnvisaLinkTPI-ADEMCO-1-03.pdf)
 
 ## Connectivity
 
