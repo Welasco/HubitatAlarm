@@ -48,3 +48,8 @@ docker manifest create welasco/hubitatalarm:1.0.0 \
     --amend welasco/hubitatalarm:amd64_1.0.0 \
     --amend welasco/hubitatalarm:armv7_1.0.0 \
     --amend welasco/hubitatalarm:armv6_1.0.0
+
+docker manifest push welasco/hubitatalarm:latest
+docker manifest push welasco/hubitatalarm:1
+docker manifest push welasco/hubitatalarm:1.0
+docker manifest push welasco/hubitatalarm:1.0.0
