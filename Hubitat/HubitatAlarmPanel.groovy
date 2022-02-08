@@ -91,12 +91,6 @@ def alarmPanelparse(evt) {
     sendEvent(name: "chime", value: evt.state)
   }
   log.warn("evt.description ${evt.description}")
-  if(evt.description.contains("CHIME")){
-    sendEvent(name: "chime", value: 'ON')
-  }
-  else{
-    sendEvent(name: "chime", value: 'OFF')
-  }
 }
 
 def alarmZoneparse(evt) {

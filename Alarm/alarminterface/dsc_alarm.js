@@ -55,7 +55,9 @@ class dsc_alarm extends EventEmitter {
     alarmChimeToggle() {
         self.#sendCommand(_dsc_commands.alarmChimeToggle());
         // wait for 1800 and call alarmSendBreak
-        setTimeout(this.alarmSendBreak(), 1800);
+        setTimeout(function(){
+            self.alarmSendBreak()
+        }, 1800);
     }
     alarmPanic() {
         self.#sendCommand(_dsc_commands.alarmPanic());
