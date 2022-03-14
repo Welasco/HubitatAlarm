@@ -4,7 +4,7 @@ WORKDIR /opt/Alarm
 COPY . .
 
 RUN apt update \
-    && apt install -y nano curl wget tcpdump dnsutils
+    && apt install -y nano curl wget tcpdump dnsutils tzdata
 
 RUN npm install -g pm2 \
     && echo "cd /opt/Alarm" >> /etc/bash.bashrc \

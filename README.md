@@ -94,13 +94,13 @@ Run Hubitat Alarm container using the following command:
 - For DSC-IT100
 
 ```bash
-docker run --name=hubitatalarm -d -p 3000:3000 -v /home/pi/hubitatalarmConfig:/opt/Alarm/config --device=/dev/ttyUSB0 --restart always welasco/hubitatalarm:latest
+docker run --name=hubitatalarm -d -p 3000:3000 -v /home/pi/hubitatalarmConfig:/opt/Alarm/config --device=/dev/ttyUSB0 -e TZ=America/Chicago --restart always welasco/hubitatalarm:latest
 ```
 
 - For Envisalink
 
 ```bash
-docker run --name=hubitatalarm -d -p 3000:3000 -v /home/pi/hubitatalarmConfig:/opt/Alarm/config --restart always welasco/hubitatalarm:latest
+docker run --name=hubitatalarm -d -p 3000:3000 -v /home/pi/hubitatalarmConfig:/opt/Alarm/config -e TZ=America/Chicago --restart always welasco/hubitatalarm:latest
 ```
 
 Hubitat Alarm will create a config.json file in the mounted folder /home/pi/hubitatalarmConfig. It's important to keep this file out of the container in case you have to update or reinstall the container.
