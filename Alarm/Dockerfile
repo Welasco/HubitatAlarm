@@ -4,7 +4,7 @@ WORKDIR /opt/Alarm
 COPY . .
 
 RUN apk update \
-    && apk add curl wget tcpdump make gcc g++ linux-headers udev python2 python3
+    && apk add curl wget tcpdump make gcc g++ linux-headers udev python2 python3 tzdata
 
 RUN npm install -g pm2 \
     && echo "cd /opt/Alarm" >> /etc/bash.bashrc \
