@@ -53,6 +53,8 @@ function parsePartitionArmed(cmd,cmdFullStr) {
     let statusBit = cmdFullStr[4];
     if(statusBit == '1' || statusBit == '3')
         msg.hsmstate = 'armedHome';
+    else
+        msg.hsmstate = 'armedStay';
     return msg;
 }
 
