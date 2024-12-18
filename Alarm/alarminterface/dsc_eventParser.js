@@ -54,7 +54,7 @@ function parsePartitionArmed(cmd,cmdFullStr) {
     if(statusBit == '1' || statusBit == '3')
         msg.hsmstate = 'armedHome';
     else
-        msg.hsmstate = 'armedStay';
+        msg.hsmstate = 'armedAway';
     return msg;
 }
 
