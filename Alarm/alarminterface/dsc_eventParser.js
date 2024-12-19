@@ -51,7 +51,7 @@ function parseCodeRequired(cmd,cmdFullStr) {
 function parsePartitionArmed(cmd,cmdFullStr) {
     let msg = command_map[cmd];
     let statusBit = cmdFullStr[4];
-    if(statusBit == '1' || statusBit == '3') {
+    if(statusBit === '1' || statusBit === '3') {
         msg.hsmstate = 'armedHome';
     }
     else {
