@@ -1,7 +1,7 @@
 {
   "packageName": "Hubitat Alarm",
   "author": "Victor Santana",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "minimumHEVersion": "2.2.4",
   "dateReleased": "2021-09-14",
   "communityLink": "https://community.hubitat.com",

@@ -96,26 +96,27 @@ def alarmPanelparse(evt) {
 def alarmZoneparse(evt) {
   log.debug("Hubitat Alarm Panel - alarmZoneparse Processing command: $evt")
   def zoneChildDevice = getChildDevice("${evt.type}-${evt.zone}")
+
   if(evt.state == "open"){
     log.warn("Zone child device evt.state ${evt.state}")
-    if(zoneChildDevice.supportedAttributes[0].toString() == "contact"){
+    if(zoneChildDevice.supportedAttributes.any { it.name == "contact" }){
       zoneChildDevice.sendEvent(name: "contact", value: "open")
     }
-    if(zoneChildDevice.supportedAttributes[0].toString() == "motion"){
+    if(zoneChildDevice.supportedAttributes.any { it.name == "motion" }){
       zoneChildDevice.sendEvent(name: "motion", value: "active")
     }
-    if(zoneChildDevice.supportedAttributes[0].toString() == "smoke"){
+    if(zoneChildDevice.supportedAttributes.any { it.name == "smoke" }){
       zoneChildDevice.sendEvent(name: "smoke", value: "detected")
     }
   }
   else if(evt.state == "closed"){
-    if(zoneChildDevice.supportedAttributes[0].toString() == "contact"){
+    if(zoneChildDevice.supportedAttributes.any { it.name == "contact" }){
       zoneChildDevice.sendEvent(name: "contact", value: "closed")
     }
-    if(zoneChildDevice.supportedAttributes[0].toString() == "motion"){
+    if(zoneChildDevice.supportedAttributes.any { it.name == "motion" }){
       zoneChildDevice.sendEvent(name: "motion", value: "inactive")
     }
-    if(zoneChildDevice.supportedAttributes[0].toString() == "smoke"){
+    if(zoneChildDevice.supportedAttributes.any { it.name == "smoke" }){
       zoneChildDevice.sendEvent(name: "smoke", value: "clear")
     }
   }
