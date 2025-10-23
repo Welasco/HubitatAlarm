@@ -15,6 +15,7 @@ exports.dsc_eventParser = dsc_eventParser
  * @parseZoneChange - parse zones update Open and Close.
  * @parseCodeRequired - parse when DSC-IT100 requires to enter the code.
  * @parseChimeToggle - parse Chime ON/OFF
+ * @parsePartitionArmed - parse the 652 partition armed message. will also read the home/away state
  *
  * @param {String} cmd - The received DSC-IT100 command. Only the first 3 numbers.
  * @param {String} cmdFullStr - The entire code number from DSC-IT100.
@@ -45,6 +46,18 @@ function parseCodeRequired(cmd,cmdFullStr) {
     let alarmCodeRequired = command_map[cmd];
     return alarmCodeRequired;
     //alarmSendCode()
+}
+
+function parsePartitionArmed(cmd,cmdFullStr) {
+    let msg = command_map[cmd];
+    let statusBit = cmdFullStr[4];
+    if(statusBit === '1' || statusBit === '3') {
+        msg.hsmstate = 'armedHome';
+    }
+    else {
+        msg.hsmstate = 'armedAway';
+    }
+    return msg;
 }
 
 function parseChimeToggle(cmd,cmdFullStr) {
@@ -172,7 +185,7 @@ var command_map = {
         'code': '652',
         'hsmstate':'armedAway',
         'type': 'partition',
-        'handler': parseGenericReceivedData
+        'handler': parsePartitionArmed
     },
     '654': {
         'name': 'Partition in Alarm',
@@ -401,3 +414,4 @@ var command_map = {
         'handler': parseChimeToggle
     }
 };
+
